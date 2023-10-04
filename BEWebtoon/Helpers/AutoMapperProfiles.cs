@@ -8,9 +8,9 @@ namespace BEWebtoon.Helpers
     {
         public AutoMapperProfiles()
         {
-            CreateMap<Users, UserDto>();
-            CreateMap<CreateUserDto, Users>();
-            CreateMap<UpdateUserDto, Users>();
+            CreateMap<User, UserDto>();
+            CreateMap<CreateUserDto, User>();
+            CreateMap<UpdateUserDto, User>();
         }
     }
 }
