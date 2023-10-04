@@ -21,11 +21,9 @@ namespace BEWebtoon.Repositories
         }
         public async Task CreateUser(CreateUserDto userDto)
         {
-            var data = _mapper.Map<Users>(userDto);
+            var data = _mapper.Map<User>(userDto);
             try
             {
-                data.FullName = userDto.FisrtName + " " +userDto.LastName;
-
                 await _dBContext.Users.AddAsync(data);
                 await _dBContext.SaveChangesAsync();
             }catch(Exception ex) 
@@ -54,7 +52,7 @@ namespace BEWebtoon.Repositories
             var users = await _dBContext.Users.ToListAsync();
             if(users != null)
             {
-                usersDto = _mapper.Map<List<Users>,List<UserDto>>(users);
+                usersDto = _mapper.Map<List<User>,List<UserDto>>(users);
             }
             return usersDto;
         }
@@ -64,7 +62,7 @@ namespace BEWebtoon.Repositories
             var user = await _dBContext.Users.FindAsync(id);
             if(user!=null)
             {
-                UserDto userDto = _mapper.Map<Users, UserDto>(user);
+                UserDto userDto = _mapper.Map<User, UserDto>(user);
                 return userDto;
             }
             else
@@ -78,14 +76,9 @@ namespace BEWebtoon.Repositories
             var user = await _dBContext.Users.Where(x=>x.Id == userDto.Id).FirstOrDefaultAsync();
             if(user != null)
             {
-                user.FisrtName = userDto.FisrtName;
-                user.LastName = userDto.LastName;
-                user.FullName = userDto.FullName;
-                user.Address = userDto.Address;
                 user.Email = userDto.Email;
                 user.Username = userDto.Username;
                 user.Password = userDto.Password;
-                user.DoB = userDto.DoB;
                 await _dBContext.SaveChangesAsync();
             }
             else
@@ -113,8 +106,8 @@ namespace BEWebtoon.Repositories
         {
             var query = await _dBContext.Users.ToListAsync();
             if (!string.IsNullOrEmpty(request.keyword))
-                query = query.Where(x => x.FisrtName.ToLower().Contains(request.keyword.ToLower())
-                                        || SearchHelper.ConvertToUnSign(x.FisrtName).ToLower().Contains(request.keyword.ToLower())).ToList();
+                query = query.Where(x => x.Username.ToLower().Contains(request.keyword.ToLower())
+                                        || SearchHelper.ConvertToUnSign(x.Username).ToLower().Contains(request.keyword.ToLower())).ToList();
             var items = _mapper.Map<IEnumerable<UserDto>>(query);
             return PagedResult<UserDto>.ToPagedList(items, request.PageIndex, request.PageSize);
         }
