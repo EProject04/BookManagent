@@ -3,7 +3,7 @@ using BEWebtoon.Models.Domains;
 
 namespace BEWebtoon.Models
 {
-    public class UserProfile : EntityAuditBase<int>, IUserTracking
+    public class UserProfile : EntityAuditBase<int>
     {
 
         public string? FistName { get; set; }
@@ -14,8 +14,6 @@ namespace BEWebtoon.Models
         public string? Sex { get; set; }
         public int? Role { get; set; }
         public string? ImagePath { get; set; }
-        public string? CreatedBy { get; set; }
-        public string? LastModifiedBy { get; set; }
         public DateTimeOffset? DateOfBirth { get; set; }
         public virtual User? Users { get; set; }
         public virtual Author? Authors { get; set; }

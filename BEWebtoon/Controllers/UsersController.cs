@@ -62,10 +62,20 @@ namespace BEWebtoon.Controllers
           if(!ModelState.IsValid) 
             return BadRequest("Du lieu khong hop le");
           await _userService.CreateUser(users);
-          return Ok(200);
+          return Ok(users);
         }
 
-      
+        [HttpPost]
+        [Route("register")]
+        public async Task<IActionResult> RegisterUser(RegisterUserDto users)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest("Du lieu khong hop le");
+            await _userService.RegisterUser(users);
+            return Ok(users);
+        }
+
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUsers(int id)
         {

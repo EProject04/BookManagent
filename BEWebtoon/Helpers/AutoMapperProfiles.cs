@@ -8,9 +8,11 @@ namespace BEWebtoon.Helpers
     {
         public AutoMapperProfiles()
         {
-            CreateMap<User, UserDto>();
+            CreateMap<User, UserDto>()
+                 .ForMember(dest => dest.RoleName, opt => opt.MapFrom(src => src.Roles.RoleName));
             CreateMap<CreateUserDto, User>();
             CreateMap<UpdateUserDto, User>();
+            CreateMap<RegisterUserDto, User>();
         }
     }
 }

@@ -1,11 +1,13 @@
 ﻿using AutoMapper;
 using BEWebtoon.DataTransferObject.UsersDto;
+using BEWebtoon.Helpers;
 using BEWebtoon.Models;
 using BEWebtoon.Pagination;
 using BEWebtoon.Requests;
 using BEWebtoon.WebtoonDBContext;
 using IOCBEWebtoon.Utilities;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 using System.Globalization;
 using System.Text;
 
@@ -15,7 +17,9 @@ namespace BEWebtoon.Repositories
     {
         private readonly WebtoonDbContext _dBContext;
         private readonly IMapper _mapper;
-        public UserRepository(WebtoonDbContext dbContext, IMapper mapper) {
+
+        public UserRepository(WebtoonDbContext dbContext, IMapper mapper)
+        {
             _dBContext = dbContext;
             _mapper = mapper;
         }
@@ -28,7 +32,8 @@ namespace BEWebtoon.Repositories
                 await _dBContext.SaveChangesAsync();
             }catch(Exception ex) 
             {
-                throw new Exception(ex.Message);
+                Log.Error($"Get exception" + ex);
+                throw;
             }
         }
 
@@ -86,21 +91,7 @@ namespace BEWebtoon.Repositories
                 throw new Exception("Khong tim thay nguoi dung");
             }
         }
-        public static string RemoveDiacritics(string text)
-        {
-            string normalized = text.Normalize(NormalizationForm.FormD);
-            StringBuilder builder = new StringBuilder();
-
-            foreach (char c in normalized)
-            {
-                if (CharUnicodeInfo.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark)
-                {
-                    builder.Append(c);
-                }
-            }
-
-            return builder.ToString();
-        }
+       
 
         public async Task<PagedResult<UserDto>> GetUserPagination(SeacrhPagingRequest request)
         {
@@ -110,6 +101,36 @@ namespace BEWebtoon.Repositories
                                         || SearchHelper.ConvertToUnSign(x.Username).ToLower().Contains(request.keyword.ToLower())).ToList();
             var items = _mapper.Map<IEnumerable<UserDto>>(query);
             return PagedResult<UserDto>.ToPagedList(items, request.PageIndex, request.PageSize);
+        }
+
+        public async Task RegisterUser(RegisterUserDto userDto)
+        {
+            var userInfo = await _dBContext.Users.Where(x=>x.Username== userDto.Username).FirstOrDefaultAsync();
+            if (userInfo != null)
+            {
+                  throw new CustomException("Nguoi dung da ton tai");
+            }
+            else
+            {
+                var data = _mapper.Map<User>(userDto);
+                data.RoleId = 3;
+                try
+                {
+                    await _dBContext.Users.AddAsync(data);
+                    await _dBContext.SaveChangesAsync();
+                }
+                catch (Exception ex)
+                {
+                    throw new CustomException($"Loi roi" + ex);
+
+                }
+            }
+           
+        }
+
+        public Task LoginUser(CreateUserDto userDto)
+        {
+            throw new NotImplementedException();
         }
     }
 }

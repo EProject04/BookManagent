@@ -1,6 +1,8 @@
-﻿namespace BEWebtoon.Models
+﻿using BEWebtoon.Models.Domains;
+
+namespace BEWebtoon.Models
 {
-    public class Users
+    public class Users : EntityAuditBase<int>
     {
         public int Id { get; set; }
         public string? FisrtName { get; set; }

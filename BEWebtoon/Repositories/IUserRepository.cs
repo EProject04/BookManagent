@@ -12,5 +12,7 @@ namespace BEWebtoon.Repositories
         Task UpdateUser(UpdateUserDto user);
         Task DeleteUser(int id);
         Task<PagedResult<UserDto>> GetUserPagination(SeacrhPagingRequest request);
+        Task RegisterUser(RegisterUserDto userDto);
+        Task LoginUser(CreateUserDto userDto);
     }
 }
