@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BEWebtoon.Migrations
 {
     [DbContext(typeof(WebtoonDbContext))]
-    [Migration("20231008082142_Initial")]
+    [Migration("20231008173541_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -338,6 +338,9 @@ namespace BEWebtoon.Migrations
                     b.Property<string>("Address")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("AuthorId")
+                        .HasColumnType("int");
+
                     b.Property<DateTimeOffset>("CreatedDate")
                         .HasColumnType("datetimeoffset");
 
@@ -362,13 +365,14 @@ namespace BEWebtoon.Migrations
                     b.Property<string>("PhoneNumber")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("Role")
-                        .HasColumnType("int");
-
                     b.Property<string>("Sex")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AuthorId")
+                        .IsUnique()
+                        .HasFilter("[AuthorId] IS NOT NULL");
 
                     b.ToTable("UserProfiles");
                 });
@@ -463,9 +467,7 @@ namespace BEWebtoon.Migrations
                 {
                     b.HasOne("BEWebtoon.Models.Author", "Authors")
                         .WithOne("UserProfiles")
-                        .HasForeignKey("BEWebtoon.Models.UserProfile", "Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
+                        .HasForeignKey("BEWebtoon.Models.UserProfile", "AuthorId")
                         .HasConstraintName("FK_UserProfile_Author");
 
                     b.HasOne("BEWebtoon.Models.User", "Users")

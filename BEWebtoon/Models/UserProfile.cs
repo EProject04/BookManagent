@@ -12,8 +12,8 @@ namespace BEWebtoon.Models
         public string? Address { get; set; }
         public string? PhoneNumber { get; set; }
         public string? Sex { get; set; }
-        public int? Role { get; set; }
         public string? ImagePath { get; set; }
+        public int? AuthorId { get; set; }
         public DateTimeOffset? DateOfBirth { get; set; }
         public virtual User? Users { get; set; }
         public virtual Author? Authors { get; set; }
