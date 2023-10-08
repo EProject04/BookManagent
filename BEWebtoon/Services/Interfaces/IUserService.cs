@@ -2,9 +2,9 @@
 using BEWebtoon.Pagination;
 using BEWebtoon.Requests;
 
-namespace BEWebtoon.Repositories
+namespace BEWebtoon.Services.Interfaces
 {
-    public interface IUserRepository
+    public interface IUserService
     {
         Task<List<UserDto>> GetAll();
         Task<UserDto> GetById(int id);
@@ -13,6 +13,7 @@ namespace BEWebtoon.Repositories
         Task DeleteUser(int id);
         Task<PagedResult<UserDto>> GetUserPagination(SeacrhPagingRequest request);
         Task RegisterUser(RegisterUserDto userDto);
-        Task LoginUser(CreateUserDto userDto);
+        Task LoginUser(LoginUserDto userDto);
+        Task Logout();
     }
 }

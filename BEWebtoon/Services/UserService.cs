@@ -1,8 +1,9 @@
 ﻿using BEWebtoon.DataTransferObject.UsersDto;
 using BEWebtoon.Models;
 using BEWebtoon.Pagination;
-using BEWebtoon.Repositories;
+using BEWebtoon.Repositories.Interfaces;
 using BEWebtoon.Requests;
+using BEWebtoon.Services.Interfaces;
 
 namespace BEWebtoon.Services
 {
@@ -36,6 +37,16 @@ namespace BEWebtoon.Services
         public Task<PagedResult<UserDto>> GetUserPagination(SeacrhPagingRequest request)
         {
             return _userRepository.GetUserPagination(request);
+        }
+
+        public async Task LoginUser(LoginUserDto userDto)
+        {
+            await _userRepository.LoginUser(userDto);
+        }
+
+        public async Task Logout()
+        {
+            await _userRepository.Logout();
         }
 
         public async Task RegisterUser(RegisterUserDto userDto)

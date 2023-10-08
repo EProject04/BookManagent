@@ -3,13 +3,11 @@ using BEWebtoon.DataTransferObject.UsersDto;
 using BEWebtoon.Helpers;
 using BEWebtoon.Models;
 using BEWebtoon.Pagination;
+using BEWebtoon.Repositories.Interfaces;
 using BEWebtoon.Requests;
 using BEWebtoon.WebtoonDBContext;
 using IOCBEWebtoon.Utilities;
 using Microsoft.EntityFrameworkCore;
-using Serilog;
-using System.Globalization;
-using System.Text;
 
 namespace BEWebtoon.Repositories
 {
@@ -17,23 +15,33 @@ namespace BEWebtoon.Repositories
     {
         private readonly WebtoonDbContext _dBContext;
         private readonly IMapper _mapper;
+        private readonly SessionManager _sessionManager;
 
-        public UserRepository(WebtoonDbContext dbContext, IMapper mapper)
+        public UserRepository(WebtoonDbContext dbContext, IMapper mapper, SessionManager sessionManager)
         {
             _dBContext = dbContext;
             _mapper = mapper;
+            _sessionManager = sessionManager;
         }
         public async Task CreateUser(CreateUserDto userDto)
         {
-            var data = _mapper.Map<User>(userDto);
-            try
+            var checkRoleId = _sessionManager.GetSessionValue("RoleId");
+            if (checkRoleId == "1")
             {
-                await _dBContext.Users.AddAsync(data);
-                await _dBContext.SaveChangesAsync();
-            }catch(Exception ex) 
+
+                var data = _mapper.Map<User>(userDto);
+                try
+                {
+                    await _dBContext.Users.AddAsync(data);
+                    await _dBContext.SaveChangesAsync();
+                }catch(Exception ex) 
+                {
+                    throw new CustomException("Nguoi dung da ton tai");
+                }
+            }
+            else
             {
-                Log.Error($"Get exception" + ex);
-                throw;
+                throw new CustomException("Ban chua duoc phan quyen");
             }
         }
 
@@ -54,7 +62,7 @@ namespace BEWebtoon.Repositories
         public async Task<List<UserDto>> GetAll()
         {
             List<UserDto> usersDto = new List<UserDto>();
-            var users = await _dBContext.Users.ToListAsync();
+            var users = await _dBContext.Users.Include(u => u.Roles).ToListAsync();
             if(users != null)
             {
                 usersDto = _mapper.Map<List<User>,List<UserDto>>(users);
@@ -65,15 +73,19 @@ namespace BEWebtoon.Repositories
         public async Task<UserDto> GetById(int id)
         {
             var user = await _dBContext.Users.FindAsync(id);
-            if(user!=null)
+            if (user != null)
             {
-                UserDto userDto = _mapper.Map<User, UserDto>(user);
-                return userDto;
+
+                    UserDto userDto = _mapper.Map<User, UserDto>(user);
+                    return userDto;
+                
             }
             else
             {
                 throw new Exception("Khong tim thay nguoi dung");
             }
+            
+           
         }
 
         public async Task UpdateUser(UpdateUserDto userDto)
@@ -128,9 +140,27 @@ namespace BEWebtoon.Repositories
            
         }
 
-        public Task LoginUser(CreateUserDto userDto)
+        public async Task LoginUser(LoginUserDto userDto)
         {
-            throw new NotImplementedException();
+            var userInfo = await _dBContext.Users.Where(x=>x.Username == userDto.Username && x.Password == userDto.Password).FirstOrDefaultAsync();
+            if(userInfo != null)
+            {
+                if (userInfo != null)
+                {
+                    _sessionManager.SetSessionValue("RoleId", userInfo.RoleId.ToString());
+                }
+            }
+            else
+            {
+                throw new CustomException("Thong tin dang nhap khong dung");
+            }
+            
+        }
+
+        public  async Task Logout()
+        {
+            _sessionManager.Logout();
+            return;
         }
     }
 }
