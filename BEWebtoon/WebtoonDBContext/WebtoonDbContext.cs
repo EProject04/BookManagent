@@ -19,6 +19,7 @@ namespace BEWebtoon.WebtoonDBContext
         public DbSet<AuthorBook> AuthorBooks { get; set; }
         public DbSet<CategoryBook> CategoryBooks { get; set; }
         public DbSet<Category> Categories { get; set; }
+        public DbSet<Role> Roles { get; set; }
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
         {
@@ -56,6 +57,14 @@ namespace BEWebtoon.WebtoonDBContext
                     .WithOne(p => p.UserProfiles)
                     .HasForeignKey<UserProfile>(a => a.Id)
                     .HasConstraintName("FK_UserProfile_Author");
+            });
+            modelBuilder.Entity<User>(entity =>
+            {
+                entity.HasOne(d => d.Roles)
+                    .WithMany(p => p.Users)
+                     .HasForeignKey(a => a.RoleId)
+                    .HasConstraintName("FK_User_Role");
+
             });
             modelBuilder.Entity<Comment>(entity =>
             {
@@ -109,6 +118,14 @@ namespace BEWebtoon.WebtoonDBContext
                     .HasConstraintName("FK_Book_CategoryBook");
 
             });
+            modelBuilder.Entity<Role>().HasData(
+                new Role { Id = 1, RoleName = "Admin", Description="Admin" },
+                new Role { Id = 2, RoleName = "Author", Description= "Author" },
+                new Role { Id = 3, RoleName = "User", Description="User" }
+                );
+            modelBuilder.Entity<User>().HasData(
+                new User { Id=1, Username="SA", Password="1", Email="SuperAdmin@gmail.com", RoleId = 1}
+                );
         }
     }
 }
