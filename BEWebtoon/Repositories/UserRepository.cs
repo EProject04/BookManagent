@@ -28,16 +28,25 @@ namespace BEWebtoon.Repositories
             var checkRoleId = _sessionManager.GetSessionValue("RoleId");
             if (checkRoleId == "1")
             {
-
-                var data = _mapper.Map<User>(userDto);
-                try
+                var users = await _dBContext.Users.Include(u => u.Roles).Where(x=>x.RoleId == userDto.RoleId).FirstOrDefaultAsync();
+                if (users != null)
                 {
-                    await _dBContext.Users.AddAsync(data);
-                    await _dBContext.SaveChangesAsync();
-                }catch(Exception ex) 
-                {
-                    throw new CustomException("Nguoi dung da ton tai");
+                    var data = _mapper.Map<User>(userDto);
+                    try
+                    {
+                        await _dBContext.Users.AddAsync(data);
+                        await _dBContext.SaveChangesAsync();
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new CustomException(ex.Message.ToString());
+                    }
                 }
+                else
+                {
+                    throw new CustomException("Không tìm thấy quyền người dùng");
+                }
+               
             }
             else
             {
@@ -90,17 +99,37 @@ namespace BEWebtoon.Repositories
 
         public async Task UpdateUser(UpdateUserDto userDto)
         {
-            var user = await _dBContext.Users.Where(x=>x.Id == userDto.Id).FirstOrDefaultAsync();
-            if(user != null)
+           
+            var checkRoleId = _sessionManager.GetSessionValue("RoleId");
+            if (checkRoleId == "1")
             {
-                user.Email = userDto.Email;
-                user.Username = userDto.Username;
-                user.Password = userDto.Password;
-                await _dBContext.SaveChangesAsync();
+                var user = await _dBContext.Users.Where(x => x.Id == userDto.Id).FirstOrDefaultAsync();
+                var checkRole = await _dBContext.Users.Include(u => u.Roles).Where(x => x.RoleId == userDto.RoleId).FirstOrDefaultAsync();
+                if (user != null)
+                {
+
+                    user.Email = userDto.Email;
+                    user.Username = userDto.Username;
+                    user.Password = userDto.Password;
+                    if (checkRole != null)
+                    {
+                        user.RoleId = userDto.RoleId;
+                    }
+                    else
+                    {
+                        throw new CustomException("Không tìm thấy quyền người dùng");
+                    }
+                    await _dBContext.SaveChangesAsync();
+                }
+                else
+                {
+                    throw new Exception("Khong tim thay nguoi dung");
+                }
+
             }
             else
             {
-                throw new Exception("Khong tim thay nguoi dung");
+                throw new CustomException("Ban chua duoc phan quyen");
             }
         }
        
@@ -129,6 +158,12 @@ namespace BEWebtoon.Repositories
                 try
                 {
                     await _dBContext.Users.AddAsync(data);
+                    await _dBContext.SaveChangesAsync();
+                    var userProfile = new UserProfile
+                    {
+                        Id = data.Id,
+                    };
+                    await _dBContext.UserProfiles.AddAsync(userProfile);
                     await _dBContext.SaveChangesAsync();
                 }
                 catch (Exception ex)

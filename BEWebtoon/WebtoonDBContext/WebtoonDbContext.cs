@@ -55,7 +55,7 @@ namespace BEWebtoon.WebtoonDBContext
 
                 entity.HasOne(d => d.Authors)
                     .WithOne(p => p.UserProfiles)
-                    .HasForeignKey<UserProfile>(a => a.Id)
+                    .HasForeignKey<UserProfile>(a => a.AuthorId)
                     .HasConstraintName("FK_UserProfile_Author");
             });
             modelBuilder.Entity<User>(entity =>
