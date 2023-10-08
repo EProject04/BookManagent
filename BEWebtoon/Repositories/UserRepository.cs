@@ -28,16 +28,25 @@ namespace BEWebtoon.Repositories
             var checkRoleId = _sessionManager.GetSessionValue("RoleId");
             if (checkRoleId == "1")
             {
-
-                var data = _mapper.Map<User>(userDto);
-                try
+                var users = await _dBContext.Users.Include(u => u.Roles).Where(x=>x.RoleId == userDto.RoleId).FirstOrDefaultAsync();
+                if (users != null)
                 {
-                    await _dBContext.Users.AddAsync(data);
-                    await _dBContext.SaveChangesAsync();
-                }catch(Exception ex) 
-                {
-                    throw new CustomException("Nguoi dung da ton tai");
+                    var data = _mapper.Map<User>(userDto);
+                    try
+                    {
+                        await _dBContext.Users.AddAsync(data);
+                        await _dBContext.SaveChangesAsync();
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new CustomException(ex.Message.ToString());
+                    }
                 }
+                else
+                {
+                    throw new CustomException("Không tìm thấy quyền người dùng");
+                }
+               
             }
             else
             {
