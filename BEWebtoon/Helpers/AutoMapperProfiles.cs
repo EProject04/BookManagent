@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using BEWebtoon.DataTransferObject.RolesDto;
+using BEWebtoon.DataTransferObject.UserProfilesDto;
 using BEWebtoon.DataTransferObject.UsersDto;
 using BEWebtoon.Models;
 
@@ -22,6 +23,12 @@ namespace BEWebtoon.Helpers
             CreateMap<Role, RoleDto>();
             CreateMap<CreateRoleDto, Role>();
             CreateMap<UpdateRoleDto, Role>();
+            #endregion
+
+            #region UserProfile
+            CreateMap<UserProfile, UserProfileDto>();
+            CreateMap<CreateUserProfileDto, UserProfile>();
+            CreateMap<UpdateUserProfileDto, UserProfile>();
             #endregion
         }
     }

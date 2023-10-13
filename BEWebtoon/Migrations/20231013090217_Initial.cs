@@ -81,7 +81,7 @@ namespace BEWebtoon.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "AuthorBooks",
+                name: "BookFollows",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -93,7 +93,7 @@ namespace BEWebtoon.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AuthorBooks", x => x.Id);
+                    table.PrimaryKey("PK_BookFollows", x => x.Id);
                     table.ForeignKey(
                         name: "FK_AuthorBook_Authors",
                         column: x => x.AuthorId,
@@ -266,13 +266,13 @@ namespace BEWebtoon.Migrations
                 values: new object[] { 1, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "SuperAdmin@gmail.com", null, "1", 1, "SA" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_AuthorBooks_AuthorId",
-                table: "AuthorBooks",
+                name: "IX_BookFollows_AuthorId",
+                table: "BookFollows",
                 column: "AuthorId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_AuthorBooks_BookId",
-                table: "AuthorBooks",
+                name: "IX_BookFollows_BookId",
+                table: "BookFollows",
                 column: "BookId");
 
             migrationBuilder.CreateIndex(
@@ -329,7 +329,7 @@ namespace BEWebtoon.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "AuthorBooks");
+                name: "BookFollows");
 
             migrationBuilder.DropTable(
                 name: "CategoryBooks");

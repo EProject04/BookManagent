@@ -3,7 +3,7 @@ using BEWebtoon.Models.Domains.Interfaces;
 
 namespace BEWebtoon.Models
 {
-    public class AuthorBook : EntityAuditBase<int>
+    public class BookFollow : EntityAuditBase<int>
     {
         public int? AuthorId { get; set; }
         public int? BookId { get; set; }

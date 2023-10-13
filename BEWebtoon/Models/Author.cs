@@ -8,6 +8,6 @@ namespace BEWebtoon.Models
     {
         public string? AuthorName { get; set; }
         public virtual UserProfile? UserProfiles { get; set; }
-        public virtual ICollection<AuthorBook>? AuthorBooks { get; set; }
+        public virtual ICollection<BookFollow>? BookFollows { get; set; }
     }
 }

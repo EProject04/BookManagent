@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BEWebtoon.Migrations
 {
     [DbContext(typeof(WebtoonDbContext))]
-    [Migration("20231008173541_Initial")]
+    [Migration("20231013090217_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -47,35 +47,6 @@ namespace BEWebtoon.Migrations
                     b.ToTable("Authors");
                 });
 
-            modelBuilder.Entity("BEWebtoon.Models.AuthorBook", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int?>("AuthorId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("BookId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTimeOffset>("CreatedDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<DateTimeOffset?>("LastModifiedDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AuthorId");
-
-                    b.HasIndex("BookId");
-
-                    b.ToTable("AuthorBooks");
-                });
-
             modelBuilder.Entity("BEWebtoon.Models.Book", b =>
                 {
                     b.Property<int>("Id")
@@ -108,6 +79,35 @@ namespace BEWebtoon.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Books");
+                });
+
+            modelBuilder.Entity("BEWebtoon.Models.BookFollow", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("AuthorId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("BookId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset>("CreatedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset?>("LastModifiedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AuthorId");
+
+                    b.HasIndex("BookId");
+
+                    b.ToTable("BookFollows");
                 });
 
             modelBuilder.Entity("BEWebtoon.Models.Category", b =>
@@ -377,15 +377,15 @@ namespace BEWebtoon.Migrations
                     b.ToTable("UserProfiles");
                 });
 
-            modelBuilder.Entity("BEWebtoon.Models.AuthorBook", b =>
+            modelBuilder.Entity("BEWebtoon.Models.BookFollow", b =>
                 {
                     b.HasOne("BEWebtoon.Models.Author", "Authors")
-                        .WithMany("AuthorBooks")
+                        .WithMany("BookFollows")
                         .HasForeignKey("AuthorId")
                         .HasConstraintName("FK_AuthorBook_Authors");
 
                     b.HasOne("BEWebtoon.Models.Book", "Books")
-                        .WithMany("AuthorBooks")
+                        .WithMany("BookFollows")
                         .HasForeignKey("BookId")
                         .HasConstraintName("FK_AuthorBook_UserProfiles");
 
@@ -484,14 +484,14 @@ namespace BEWebtoon.Migrations
 
             modelBuilder.Entity("BEWebtoon.Models.Author", b =>
                 {
-                    b.Navigation("AuthorBooks");
+                    b.Navigation("BookFollows");
 
                     b.Navigation("UserProfiles");
                 });
 
             modelBuilder.Entity("BEWebtoon.Models.Book", b =>
                 {
-                    b.Navigation("AuthorBooks");
+                    b.Navigation("BookFollows");
 
                     b.Navigation("CategoryBooks");
 
