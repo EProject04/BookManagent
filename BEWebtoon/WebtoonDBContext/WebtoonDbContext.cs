@@ -126,6 +126,9 @@ namespace BEWebtoon.WebtoonDBContext
             modelBuilder.Entity<User>().HasData(
                 new User { Id=1, Username="SA", Password="1", Email="SuperAdmin@gmail.com", RoleId = 1}
                 );
+            modelBuilder.Entity<UserProfile>().HasData(
+                new UserProfile { Id = 1, FistName="Super", LastName="Admin", Address="Ha noi", Email = "SuperAdmin@gmail.com" }
+                );
         }
     }
 }

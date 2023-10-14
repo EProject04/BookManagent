@@ -17,6 +17,7 @@ namespace BEWebtoon.Repositories
         private readonly IMapper _mapper;
         private readonly SessionManager _sessionManager;
 
+
         public UserRepository(WebtoonDbContext dbContext, IMapper mapper, SessionManager sessionManager)
         {
             _dBContext = dbContext;
@@ -25,16 +26,21 @@ namespace BEWebtoon.Repositories
         }
         public async Task CreateUser(CreateUserDto userDto)
         {
-            var checkRoleId = _sessionManager.GetSessionValue("RoleId");
-            if (checkRoleId == "1")
+            if (_sessionManager.CheckRole(ROLE_CONSTANTS.Admin))
             {
-                var users = await _dBContext.Users.Include(u => u.Roles).Where(x=>x.RoleId == userDto.RoleId).FirstOrDefaultAsync();
-                if (users != null)
+                var role = await _dBContext.Roles.Where(x=>x.Id == userDto.RoleId).FirstOrDefaultAsync();   
+                if (role != null)
                 {
                     var data = _mapper.Map<User>(userDto);
                     try
                     {
                         await _dBContext.Users.AddAsync(data);
+                        await _dBContext.SaveChangesAsync();
+                        var userProfile = new UserProfile
+                        {
+                            Id = data.Id,
+                        };
+                        await _dBContext.UserProfiles.AddAsync(userProfile);
                         await _dBContext.SaveChangesAsync();
                     }
                     catch (Exception ex)
@@ -48,69 +54,69 @@ namespace BEWebtoon.Repositories
                 }
                
             }
-            else
-            {
-                throw new CustomException("Ban chua duoc phan quyen");
-            }
         }
 
         public async Task DeleteUser(int id)
         {
-            var user = await _dBContext.Users.FindAsync(id);
-            if (user != null)
+            if (_sessionManager.CheckRole(ROLE_CONSTANTS.Admin))
             {
-                _dBContext.Users.Remove(user);
-                await _dBContext.SaveChangesAsync();
-            }
-            else
-            {
-                throw new Exception("Khong tim thay nguoi dung");
+                var user = await _dBContext.Users.FindAsync(id);
+                if (user != null)
+                {
+                    _dBContext.Users.Remove(user);
+                    await _dBContext.SaveChangesAsync();
+                }
+                else
+                {
+                    throw new Exception("Khong tim thay nguoi dung");
+                }
             }
         }
 
         public async Task<List<UserDto>> GetAll()
         {
-            List<UserDto> usersDto = new List<UserDto>();
-            var users = await _dBContext.Users.Include(u => u.Roles).ToListAsync();
-            if(users != null)
+            if (_sessionManager.CheckRole(ROLE_CONSTANTS.Admin))
             {
-                usersDto = _mapper.Map<List<User>,List<UserDto>>(users);
+                List<UserDto> usersDto = new List<UserDto>();
+                var users = await _dBContext.Users.Include(u => u.Roles).ToListAsync();
+                if (users != null)
+                {
+                    usersDto = _mapper.Map<List<User>, List<UserDto>>(users);
+                }
+                return usersDto;
             }
-            return usersDto;
+            return null;
         }
 
         public async Task<UserDto> GetById(int id)
         {
-            var user = await _dBContext.Users.FindAsync(id);
-            if (user != null)
+            if (_sessionManager.CheckRole(ROLE_CONSTANTS.Admin))
             {
+                var user = await _dBContext.Users.FindAsync(id);
+                if (user != null)
+                {
 
                     UserDto userDto = _mapper.Map<User, UserDto>(user);
                     return userDto;
-                
+
+                }
+                else
+                {
+                    throw new Exception("Khong tim thay nguoi dung");
+                }
             }
-            else
-            {
-                throw new Exception("Khong tim thay nguoi dung");
-            }
-            
-           
+            return null;
         }
 
         public async Task UpdateUser(UpdateUserDto userDto)
         {
-           
-            var checkRoleId = _sessionManager.GetSessionValue("RoleId");
-            if (checkRoleId == "1")
-            {
+            if (_sessionManager.CheckRole(ROLE_CONSTANTS.Admin))
+            { 
+                await _dBContext.Database.BeginTransactionAsync();
                 var user = await _dBContext.Users.Where(x => x.Id == userDto.Id).FirstOrDefaultAsync();
-                var checkRole = await _dBContext.Users.Include(u => u.Roles).Where(x => x.RoleId == userDto.RoleId).FirstOrDefaultAsync();
+                var checkRole = await _dBContext.Roles.Where(x => x.Id == userDto.RoleId).FirstOrDefaultAsync();
                 if (user != null)
                 {
-
-                    user.Email = userDto.Email;
-                    user.Username = userDto.Username;
-                    user.Password = userDto.Password;
                     if (checkRole != null)
                     {
                         user.RoleId = userDto.RoleId;
@@ -119,17 +125,14 @@ namespace BEWebtoon.Repositories
                     {
                         throw new CustomException("Không tìm thấy quyền người dùng");
                     }
+                    _dBContext.Entry(user).CurrentValues.SetValues(userDto);
                     await _dBContext.SaveChangesAsync();
+                    await _dBContext.Database.CommitTransactionAsync();
                 }
                 else
                 {
                     throw new Exception("Khong tim thay nguoi dung");
                 }
-
-            }
-            else
-            {
-                throw new CustomException("Ban chua duoc phan quyen");
             }
         }
        

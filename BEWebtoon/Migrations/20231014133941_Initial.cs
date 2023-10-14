@@ -167,6 +167,7 @@ namespace BEWebtoon.Migrations
                     FullName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Sex = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ImagePath = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     AuthorId = table.Column<int>(type: "int", nullable: true),
@@ -264,6 +265,11 @@ namespace BEWebtoon.Migrations
                 table: "Users",
                 columns: new[] { "Id", "CreatedDate", "Email", "LastModifiedDate", "Password", "RoleId", "Username" },
                 values: new object[] { 1, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "SuperAdmin@gmail.com", null, "1", 1, "SA" });
+
+            migrationBuilder.InsertData(
+                table: "UserProfiles",
+                columns: new[] { "Id", "Address", "AuthorId", "CreatedDate", "DateOfBirth", "Email", "FistName", "FullName", "ImagePath", "LastModifiedDate", "LastName", "PhoneNumber", "Sex" },
+                values: new object[] { 1, "Ha noi", null, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), null, "SuperAdmin@gmail.com", "Super", null, null, null, "Admin", null, null });
 
             migrationBuilder.CreateIndex(
                 name: "IX_BookFollows_AuthorId",

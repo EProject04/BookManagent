@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BEWebtoon.Migrations
 {
     [DbContext(typeof(WebtoonDbContext))]
-    [Migration("20231013090217_Initial")]
+    [Migration("20231014133941_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -347,6 +347,9 @@ namespace BEWebtoon.Migrations
                     b.Property<DateTimeOffset?>("DateOfBirth")
                         .HasColumnType("datetimeoffset");
 
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("FistName")
                         .HasColumnType("nvarchar(max)");
 
@@ -375,6 +378,17 @@ namespace BEWebtoon.Migrations
                         .HasFilter("[AuthorId] IS NOT NULL");
 
                     b.ToTable("UserProfiles");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Address = "Ha noi",
+                            CreatedDate = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Email = "SuperAdmin@gmail.com",
+                            FistName = "Super",
+                            LastName = "Admin"
+                        });
                 });
 
             modelBuilder.Entity("BEWebtoon.Models.BookFollow", b =>

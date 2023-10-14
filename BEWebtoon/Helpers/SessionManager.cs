@@ -22,5 +22,18 @@
         {
             _httpContextAccessor.HttpContext.Session.Clear(); 
         }
+        public bool CheckRole(string[] allowedRoleIds)
+        {
+            var checkRoleId = GetSessionValue("RoleId");
+
+            if (allowedRoleIds.Contains(checkRoleId))
+            {
+                return true;
+            }
+            else
+            {
+                throw new CustomException("Ban chua duoc phan quyen");
+            }
+        }
     }
 }
