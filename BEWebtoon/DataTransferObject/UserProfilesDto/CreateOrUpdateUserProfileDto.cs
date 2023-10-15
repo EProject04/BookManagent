@@ -9,7 +9,7 @@ namespace BEWebtoon.DataTransferObject.UserProfilesDto
         public string? Address { get; set; }
         public string? Email { get; set; }
         public string? PhoneNumber { get; set; }
-        public string? Sex { get; set; }
+        public bool? Gender { get; set; }
         [AllowedExtensions(new string[] { ".jpg", ".png", ".svg", ".jpeg" })]
         public IFormFile? File { get; set; }
         public string? ImagePath { get; set; }

@@ -28,7 +28,8 @@ namespace BEWebtoon.Repositories
         {
             if (_sessionManager.CheckRole(ROLE_CONSTANTS.Admin))
             {
-                var role = await _dBContext.Roles.Where(x=>x.Id == userDto.RoleId).FirstOrDefaultAsync();   
+                var role = await _dBContext.Roles.Where(x=>x.Id == userDto.RoleId).FirstOrDefaultAsync();
+
                 if (role != null)
                 {
                     var data = _mapper.Map<User>(userDto);
@@ -39,9 +40,20 @@ namespace BEWebtoon.Repositories
                         var userProfile = new UserProfile
                         {
                             Id = data.Id,
+                            Email = data.Email,
+
                         };
+                        if (userDto.RoleId == 2)
+                        {
+                            var author = new Author
+                            {
+                                AuthorName = data.Username,
+                            };
+                            userProfile.Authors = author; 
+                        }
                         await _dBContext.UserProfiles.AddAsync(userProfile);
                         await _dBContext.SaveChangesAsync();
+                       
                     }
                     catch (Exception ex)
                     {
@@ -114,17 +126,8 @@ namespace BEWebtoon.Repositories
             { 
                 await _dBContext.Database.BeginTransactionAsync();
                 var user = await _dBContext.Users.Where(x => x.Id == userDto.Id).FirstOrDefaultAsync();
-                var checkRole = await _dBContext.Roles.Where(x => x.Id == userDto.RoleId).FirstOrDefaultAsync();
                 if (user != null)
                 {
-                    if (checkRole != null)
-                    {
-                        user.RoleId = userDto.RoleId;
-                    }
-                    else
-                    {
-                        throw new CustomException("Không tìm thấy quyền người dùng");
-                    }
                     _dBContext.Entry(user).CurrentValues.SetValues(userDto);
                     await _dBContext.SaveChangesAsync();
                     await _dBContext.Database.CommitTransactionAsync();
@@ -139,12 +142,17 @@ namespace BEWebtoon.Repositories
 
         public async Task<PagedResult<UserDto>> GetUserPagination(SeacrhPagingRequest request)
         {
-            var query = await _dBContext.Users.ToListAsync();
-            if (!string.IsNullOrEmpty(request.keyword))
-                query = query.Where(x => x.Username.ToLower().Contains(request.keyword.ToLower())
-                                        || SearchHelper.ConvertToUnSign(x.Username).ToLower().Contains(request.keyword.ToLower())).ToList();
-            var items = _mapper.Map<IEnumerable<UserDto>>(query);
-            return PagedResult<UserDto>.ToPagedList(items, request.PageIndex, request.PageSize);
+            if (_sessionManager.CheckRole(ROLE_CONSTANTS.Admin))
+            {
+                var query = await _dBContext.Users.ToListAsync();
+                if (!string.IsNullOrEmpty(request.keyword))
+                    query = query.Where(x => x.Username.ToLower().Contains(request.keyword.ToLower())
+                                            || SearchHelper.ConvertToUnSign(x.Username).ToLower().Contains(request.keyword.ToLower())).ToList();
+                var items = _mapper.Map<IEnumerable<UserDto>>(query);
+                return PagedResult<UserDto>.ToPagedList(items, request.PageIndex, request.PageSize);
+            }
+            return null;
+           
         }
 
         public async Task RegisterUser(RegisterUserDto userDto)
@@ -165,6 +173,7 @@ namespace BEWebtoon.Repositories
                     var userProfile = new UserProfile
                     {
                         Id = data.Id,
+                        Email = data.Email,
                     };
                     await _dBContext.UserProfiles.AddAsync(userProfile);
                     await _dBContext.SaveChangesAsync();

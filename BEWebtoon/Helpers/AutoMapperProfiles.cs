@@ -1,8 +1,11 @@
 ﻿using AutoMapper;
+using BEWebtoon.DataTransferObject.AuthorDto;
+using BEWebtoon.DataTransferObject.BooksDto;
 using BEWebtoon.DataTransferObject.RolesDto;
 using BEWebtoon.DataTransferObject.UserProfilesDto;
 using BEWebtoon.DataTransferObject.UsersDto;
 using BEWebtoon.Models;
+using BEWebtoon.Requests.BookRequest;
 
 namespace BEWebtoon.Helpers
 {
@@ -29,6 +32,20 @@ namespace BEWebtoon.Helpers
             CreateMap<UserProfile, UserProfileDto>();
             CreateMap<CreateUserProfileDto, UserProfile>();
             CreateMap<UpdateUserProfileDto, UserProfile>();
+            #endregion
+
+            #region Book
+            CreateMap<Book, BookDto>();
+            CreateMap<CreateBookDto, Book>();
+            CreateMap<UpdateBookDto, Book>();
+            CreateMap<CategoryBook, BookRequest>()
+               .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Categories.CategoryName));
+            #endregion
+
+            #region Author
+            CreateMap<Author, AuthorDto>();
+            CreateMap<CreateAuthorDto, Author>();
+            CreateMap<UpdateAuthorDto, Author>();
             #endregion
         }
     }

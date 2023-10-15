@@ -168,7 +168,7 @@ namespace BEWebtoon.Migrations
                     Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Sex = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Gender = table.Column<bool>(type: "bit", nullable: true),
                     ImagePath = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     AuthorId = table.Column<int>(type: "int", nullable: true),
                     DateOfBirth = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
@@ -201,7 +201,6 @@ namespace BEWebtoon.Migrations
                     Rate = table.Column<int>(type: "int", nullable: true),
                     UserId = table.Column<int>(type: "int", nullable: true),
                     BookId = table.Column<int>(type: "int", nullable: true),
-                    BookId1 = table.Column<int>(type: "int", nullable: true),
                     CreatedDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     LastModifiedDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
                 },
@@ -217,11 +216,6 @@ namespace BEWebtoon.Migrations
                         name: "FK_Comment_UserProfiles",
                         column: x => x.UserId,
                         principalTable: "UserProfiles",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Comments_Books_BookId1",
-                        column: x => x.BookId1,
-                        principalTable: "Books",
                         principalColumn: "Id");
                 });
 
@@ -268,8 +262,8 @@ namespace BEWebtoon.Migrations
 
             migrationBuilder.InsertData(
                 table: "UserProfiles",
-                columns: new[] { "Id", "Address", "AuthorId", "CreatedDate", "DateOfBirth", "Email", "FistName", "FullName", "ImagePath", "LastModifiedDate", "LastName", "PhoneNumber", "Sex" },
-                values: new object[] { 1, "Ha noi", null, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), null, "SuperAdmin@gmail.com", "Super", null, null, null, "Admin", null, null });
+                columns: new[] { "Id", "Address", "AuthorId", "CreatedDate", "DateOfBirth", "Email", "FistName", "FullName", "Gender", "ImagePath", "LastModifiedDate", "LastName", "PhoneNumber" },
+                values: new object[] { 1, "Ha noi", null, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), null, "SuperAdmin@gmail.com", "Super", null, null, null, null, "Admin", null });
 
             migrationBuilder.CreateIndex(
                 name: "IX_BookFollows_AuthorId",
@@ -295,13 +289,6 @@ namespace BEWebtoon.Migrations
                 name: "IX_Comments_BookId",
                 table: "Comments",
                 column: "BookId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Comments_BookId1",
-                table: "Comments",
-                column: "BookId1",
-                unique: true,
-                filter: "[BookId1] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Comments_UserId",

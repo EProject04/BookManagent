@@ -1,11 +1,9 @@
 ﻿using AutoMapper;
 using BEWebtoon.DataTransferObject.UserProfilesDto;
-using BEWebtoon.DataTransferObject.UsersDto;
 using BEWebtoon.Helpers;
 using BEWebtoon.Models;
 using BEWebtoon.Pagination;
 using BEWebtoon.Repositories.Interfaces;
-using BEWebtoon.Requests;
 using BEWebtoon.Requests.UserProfileRequest;
 using BEWebtoon.WebtoonDBContext;
 using IOC.ApplicationLayer.Utilities;
@@ -28,27 +26,34 @@ namespace BEWebtoon.Repositories
 
         public async Task DeleteUserProfile(int id)
         {
-            var user = await _dBContext.UserProfiles.FindAsync(id);
-            if (user != null)
+            if (_sessionManager.CheckRole(ROLE_CONSTANTS.Admin))
             {
-                _dBContext.UserProfiles.Remove(user);
-                await _dBContext.SaveChangesAsync();
-            }
-            else
-            {
-                throw new Exception("Khong tim thay nguoi dung");
+                var user = await _dBContext.UserProfiles.FindAsync(id);
+                if (user != null)
+                {
+                    _dBContext.UserProfiles.Remove(user);
+                    await _dBContext.SaveChangesAsync();
+                }
+                else
+                {
+                    throw new Exception("Khong tim thay nguoi dung");
+                }
             }
         }
 
         public async Task<List<UserProfileDto>> GetAll()
         {
-            List<UserProfileDto> usersDto = new List<UserProfileDto>();
-            var users = await _dBContext.UserProfiles.ToListAsync();
-            if (users != null)
+            if (_sessionManager.CheckRole(ROLE_CONSTANTS.Admin))
             {
-                usersDto = _mapper.Map<List<UserProfile>, List<UserProfileDto>>(users);
+                List<UserProfileDto> usersDto = new List<UserProfileDto>();
+                var users = await _dBContext.UserProfiles.ToListAsync();
+                if (users != null)
+                {
+                    usersDto = _mapper.Map<List<UserProfile>, List<UserProfileDto>>(users);
+                }
+                return usersDto;
             }
-            return usersDto;
+            return null;
         }
 
         public async Task<UserProfileDto> GetById(int id)
@@ -69,25 +74,29 @@ namespace BEWebtoon.Repositories
 
         public async Task<PagedResult<UserProfileDto>> GetUserProfilePagination(UserProfileRequest request)
         {
-            var query = await _dBContext.UserProfiles.Include(x => x.Authors).ToListAsync();
-            if (!string.IsNullOrWhiteSpace(request.keyword.TrimAndLower()))
+            if (_sessionManager.CheckRole(ROLE_CONSTANTS.Admin))
             {
-                query = query.Where(x => x.FullName.TrimAndLower().Contains(request.keyword.TrimAndLower())
-                                        || SearchHelper.ConvertToUnSign(x.FullName).TrimAndLower().Contains(request.keyword.TrimAndLower())
-                                        || x.Address.TrimAndLower().Contains(request.keyword.TrimAndLower())
-                                        || x.PhoneNumber.TrimAndLower().Contains(request.keyword.TrimAndLower())
-                                        || x.FistName.TrimAndLower().Contains(request.keyword.TrimAndLower())
-                                        || x.LastName.TrimAndLower().Contains(request.keyword.TrimAndLower())
-                                        || x.Email.TrimAndLower().Contains(request.keyword.TrimAndLower())).ToList();
-                if (request.DateOfBirth != null)
+                var query = await _dBContext.UserProfiles.Include(x => x.Authors).ToListAsync();
+                if (!string.IsNullOrWhiteSpace(request.keyword.TrimAndLower()))
                 {
-                    query = query.Where(x => x.DateOfBirth?.Year == request.DateOfBirth.Value.Year
-                                          && x.DateOfBirth?.Month == request.DateOfBirth.Value.Month
-                                          && x.DateOfBirth?.Day == request.DateOfBirth.Value.Day).ToList();
+                    query = query.Where(x => x.FullName.TrimAndLower().Contains(request.keyword.TrimAndLower())
+                                            || SearchHelper.ConvertToUnSign(x.FullName).TrimAndLower().Contains(request.keyword.TrimAndLower())
+                                            || x.Address.TrimAndLower().Contains(request.keyword.TrimAndLower())
+                                            || x.PhoneNumber.TrimAndLower().Contains(request.keyword.TrimAndLower())
+                                            || x.FistName.TrimAndLower().Contains(request.keyword.TrimAndLower())
+                                            || x.LastName.TrimAndLower().Contains(request.keyword.TrimAndLower())
+                                            || x.Email.TrimAndLower().Contains(request.keyword.TrimAndLower())).ToList();
+                    if (request.DateOfBirth != null)
+                    {
+                        query = query.Where(x => x.DateOfBirth?.Year == request.DateOfBirth.Value.Year
+                                              && x.DateOfBirth?.Month == request.DateOfBirth.Value.Month
+                                              && x.DateOfBirth?.Day == request.DateOfBirth.Value.Day).ToList();
+                    }
                 }
+                var items = _mapper.Map<IEnumerable<UserProfileDto>>(query);
+                return PagedResult<UserProfileDto>.ToPagedList(items, request.PageIndex, request.PageSize);
             }
-            var items = _mapper.Map<IEnumerable<UserProfileDto>>(query);
-            return PagedResult<UserProfileDto>.ToPagedList(items, request.PageIndex, request.PageSize);
+            return null;
         }
 
         public async Task UpdateUserProfile(UpdateUserProfileDto updateUserProfileDto)

@@ -175,9 +175,6 @@ namespace BEWebtoon.Migrations
                     b.Property<int?>("BookId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("BookId1")
-                        .HasColumnType("int");
-
                     b.Property<string>("CommentText")
                         .HasColumnType("nvarchar(max)");
 
@@ -196,10 +193,6 @@ namespace BEWebtoon.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("BookId");
-
-                    b.HasIndex("BookId1")
-                        .IsUnique()
-                        .HasFilter("[BookId1] IS NOT NULL");
 
                     b.HasIndex("UserId");
 
@@ -353,6 +346,9 @@ namespace BEWebtoon.Migrations
                     b.Property<string>("FullName")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool?>("Gender")
+                        .HasColumnType("bit");
+
                     b.Property<string>("ImagePath")
                         .HasColumnType("nvarchar(max)");
 
@@ -363,9 +359,6 @@ namespace BEWebtoon.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PhoneNumber")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Sex")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -432,10 +425,6 @@ namespace BEWebtoon.Migrations
                         .WithMany("Comments")
                         .HasForeignKey("BookId")
                         .HasConstraintName("FK_Book_UserProfiles");
-
-                    b.HasOne("BEWebtoon.Models.Book", null)
-                        .WithOne("Commnets")
-                        .HasForeignKey("BEWebtoon.Models.Comment", "BookId1");
 
                     b.HasOne("BEWebtoon.Models.UserProfile", "UserProfiles")
                         .WithMany("Comments")
@@ -507,8 +496,6 @@ namespace BEWebtoon.Migrations
                     b.Navigation("CategoryBooks");
 
                     b.Navigation("Comments");
-
-                    b.Navigation("Commnets");
 
                     b.Navigation("Followings");
                 });
