@@ -28,42 +28,53 @@ namespace BEWebtoon.Repositories
         {
             if (_sessionManager.CheckRole(ROLE_CONSTANTS.Admin))
             {
-                var role = await _dBContext.Roles.Where(x=>x.Id == userDto.RoleId).FirstOrDefaultAsync();
-
-                if (role != null)
+                var userInfo = await _dBContext.Users.Where(x => x.Username == userDto.Username).FirstOrDefaultAsync();
+                if (userInfo != null)
                 {
-                    var data = _mapper.Map<User>(userDto);
-                    try
-                    {
-                        await _dBContext.Users.AddAsync(data);
-                        await _dBContext.SaveChangesAsync();
-                        var userProfile = new UserProfile
-                        {
-                            Id = data.Id,
-                            Email = data.Email,
-
-                        };
-                        if (userDto.RoleId == 2)
-                        {
-                            var author = new Author
-                            {
-                                AuthorName = data.Username,
-                            };
-                            userProfile.Authors = author; 
-                        }
-                        await _dBContext.UserProfiles.AddAsync(userProfile);
-                        await _dBContext.SaveChangesAsync();
-                       
-                    }
-                    catch (Exception ex)
-                    {
-                        throw new CustomException(ex.Message.ToString());
-                    }
+                    throw new CustomException("Nguoi dung da ton tai");
                 }
                 else
                 {
-                    throw new CustomException("Không tìm thấy quyền người dùng");
+                    var role = await _dBContext.Roles.Where(x => x.Id == userDto.RoleId).FirstOrDefaultAsync();
+
+                    if (role != null)
+                    {
+                        var data = _mapper.Map<User>(userDto);
+                        try
+                        {
+                            await _dBContext.Users.AddAsync(data);
+                            await _dBContext.SaveChangesAsync();
+                            var userProfile = new UserProfile
+                            {
+                                Id = data.Id,
+                                Email = data.Email,
+
+                            };
+                            if (userDto.RoleId == 2)
+                            {
+                                var author = new Author
+                                {
+                                    AuthorName = data.Username,
+                                };
+                                userProfile.Authors = author;
+                            }
+                            await _dBContext.UserProfiles.AddAsync(userProfile);
+                            await _dBContext.SaveChangesAsync();
+
+                        }
+                        catch (Exception ex)
+                        {
+                            throw new CustomException(ex.Message.ToString());
+                        }
+                    }
+                    else
+                    {
+                        throw new CustomException("Không tìm thấy quyền người dùng");
+                    }
                 }
+
+
+                
                
             }
         }
@@ -164,17 +175,26 @@ namespace BEWebtoon.Repositories
             }
             else
             {
+                
                 var data = _mapper.Map<User>(userDto);
-                data.RoleId = 3;
                 try
                 {
                     await _dBContext.Users.AddAsync(data);
                     await _dBContext.SaveChangesAsync();
+
                     var userProfile = new UserProfile
                     {
                         Id = data.Id,
                         Email = data.Email,
                     };
+                    if (userDto.RoleId == 2)
+                    {
+                        var author = new Author
+                        {
+                            AuthorName = data.Username,
+                        };
+                        userProfile.Authors = author;
+                    }
                     await _dBContext.UserProfiles.AddAsync(userProfile);
                     await _dBContext.SaveChangesAsync();
                 }
@@ -195,7 +215,9 @@ namespace BEWebtoon.Repositories
                 if (userInfo != null)
                 {
                     _sessionManager.SetSessionValue("RoleId", userInfo.RoleId.ToString());
+                    _sessionManager.SetSessionValueInt("UserId", userInfo.Id);
                 }
+                
             }
             else
             {

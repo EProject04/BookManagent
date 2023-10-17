@@ -11,5 +11,7 @@ namespace BEWebtoon.DataTransferObject.BooksDto
         public IFormFile? File { get; set; }
         public string? ImagePath { get; set; }
         public bool? Status { get; set; }
+        public List<int>? CategoryId { get; set; }
+        public List<int>? AuthorId { get; set; }
     }
 }

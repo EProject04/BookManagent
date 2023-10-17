@@ -26,6 +26,8 @@ builder.Services.AddTransient<IBookRepository, BookRepository>();
 builder.Services.AddTransient<IBookService, BookService>();
 builder.Services.AddTransient<IAuthorRepository, AuthorRepository>();
 builder.Services.AddTransient<IAuthorService, AuthorService>();
+builder.Services.AddTransient<ICategoryRepository, CategoryRepository>();
+builder.Services.AddTransient<ICategoryService, CategoryService>();
 builder.Services.AddControllers();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddHttpContextAccessor();

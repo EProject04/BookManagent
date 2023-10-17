@@ -18,6 +18,16 @@
         {
             _httpContextAccessor.HttpContext.Session.SetString(key, value);
         }
+
+        public void SetSessionValueInt(string key, int value)
+        {
+            _httpContextAccessor.HttpContext.Session.SetInt32(key, value);
+        }
+
+        public int GetSessionValueInt(string key)
+        {
+            return (int) _httpContextAccessor.HttpContext.Session.GetInt32(key);
+        }
         public void Logout()
         {
             _httpContextAccessor.HttpContext.Session.Clear(); 

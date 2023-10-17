@@ -46,7 +46,7 @@ namespace BEWebtoon.Repositories
             if (_sessionManager.CheckRole(ROLE_CONSTANTS.Admin))
             {
                 List<UserProfileDto> usersDto = new List<UserProfileDto>();
-                var users = await _dBContext.UserProfiles.ToListAsync();
+                var users = await _dBContext.UserProfiles.Include(x=>x.Users).ThenInclude(x=>x.Roles).ToListAsync();
                 if (users != null)
                 {
                     usersDto = _mapper.Map<List<UserProfile>, List<UserProfileDto>>(users);

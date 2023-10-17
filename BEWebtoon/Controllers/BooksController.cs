@@ -46,7 +46,7 @@ namespace BEWebtoon.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateBooks(CreateBookDto books)
+        public async Task<IActionResult> CreateBooks([FromForm] CreateBookDto books)
         {
             try
             {
