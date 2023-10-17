@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BEWebtoon.Migrations
 {
     [DbContext(typeof(WebtoonDbContext))]
-    [Migration("20231015034049_Initial")]
+    [Migration("20231017032030_Initial")]
     partial class Initial
     {
         /// <inheritdoc />

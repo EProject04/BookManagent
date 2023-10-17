@@ -81,10 +81,6 @@ namespace BEWebtoon.Repositories
                 if (!string.IsNullOrEmpty(request.keyword))
                     query = query.Where(x => x.Title.ToLower().Contains(request.keyword.ToLower())
                                             || SearchHelper.ConvertToUnSign(x.Title).ToLower().Contains(request.keyword.ToLower())).ToList();
-                if (request.CategoryName != null)
-                {
-                    query = query.Where(x => x.CategoryBooks.Any(cb => cb.CategoryBookName.TrimAndLower().Contains(request.CategoryName.TrimAndLower()))).ToList();
-                }
                 var items = _mapper.Map<IEnumerable<BookDto>>(query);
                 return PagedResult<BookDto>.ToPagedList(items, request.PageIndex, request.PageSize);
             }
