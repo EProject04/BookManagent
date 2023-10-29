@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BEWebtoon.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/books")]
     [ApiController]
     public class BooksController : ControllerBase
     {
@@ -19,7 +19,7 @@ namespace BEWebtoon.Controllers
         {
             _bookService = bookService;
         }
-        [HttpGet]
+        [HttpGet("get-all-book")]
         public async Task<ActionResult<List<BookDto>>> GetAll()
         {
             try
@@ -32,7 +32,7 @@ namespace BEWebtoon.Controllers
             }
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("get-book-by-id/{id}")]
         public async Task<ActionResult<BookDto>> GetBooksById(int id)
         {
             try
@@ -45,7 +45,7 @@ namespace BEWebtoon.Controllers
             }
         }
 
-        [HttpPost]
+        [HttpPost("create-book")]
         public async Task<IActionResult> CreateBooks([FromForm] CreateBookDto books)
         {
             try
@@ -75,7 +75,7 @@ namespace BEWebtoon.Controllers
 
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("update-book/{id}")]
         public async Task<IActionResult> UpdateBook([FromForm] UpdateBookDto BookDto)
         {
             try
@@ -95,7 +95,7 @@ namespace BEWebtoon.Controllers
         }
 
 
-        [HttpDelete("{id}")]
+        [HttpDelete("delete-book/{id}")]
         public async Task<IActionResult> DeleteBooks(int id)
         {
             try

@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BEWebtoon.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/authors")]
     [ApiController]
     public class AuthorsController : ControllerBase
     {
@@ -14,7 +14,7 @@ namespace BEWebtoon.Controllers
         {
             _authorService = authorService;
         }
-        [HttpGet]
+        [HttpGet("get-all-author")]
         public async Task<ActionResult<List<AuthorDto>>> GetAll()
         {
             try
@@ -27,7 +27,8 @@ namespace BEWebtoon.Controllers
             }
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("get-author-by-id/{id}")]
+        
         public async Task<ActionResult<AuthorDto>> GetAuthorsById(int id)
         {
             try
@@ -54,7 +55,7 @@ namespace BEWebtoon.Controllers
 
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("update-author/{id}")]
         public async Task<IActionResult> UpdateAuthor([FromForm] UpdateAuthorDto AuthorDto)
         {
             try
@@ -74,7 +75,7 @@ namespace BEWebtoon.Controllers
         }
 
 
-        [HttpDelete("{id}")]
+        [HttpDelete("delete-author/{id}")]
         public async Task<IActionResult> DeleteAuthors(int id)
         {
             try

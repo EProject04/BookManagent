@@ -4,6 +4,7 @@ using BEWebtoon.DataTransferObject.BookFollowsDto;
 using BEWebtoon.DataTransferObject.BooksDto;
 using BEWebtoon.DataTransferObject.CategoriesBookDto;
 using BEWebtoon.DataTransferObject.CategoriesDto;
+using BEWebtoon.DataTransferObject.CommentsDto;
 using BEWebtoon.DataTransferObject.RolesDto;
 using BEWebtoon.DataTransferObject.UserProfilesDto;
 using BEWebtoon.DataTransferObject.UsersDto;
@@ -71,6 +72,13 @@ namespace BEWebtoon.Helpers
                 .ForMember(dest => dest.CategoryId, otp => otp.MapFrom(src => src.Categories.Id))
                 .ForMember(dest => dest.BookId, otp => otp.MapFrom(src => src.Books.Id))
                 .ForMember(dest => dest.CategoryName, otp => otp.MapFrom(src => src.Categories.CategoryName));
+            #endregion
+
+            #region Comment
+            CreateMap<Comment, CommentDto>()
+                .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.UserProfiles.FullName));
+            CreateMap<CreateCommentDto, Comment>();
+            CreateMap<UpdateCommentDto, Comment>();
             #endregion
         }
     }

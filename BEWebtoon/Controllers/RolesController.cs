@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BEWebtoon.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/roles")]
     [ApiController]
     public class RolesController : ControllerBase
     {
@@ -16,7 +16,7 @@ namespace BEWebtoon.Controllers
         {
             _roleServices = roleService;
         }
-        [HttpGet]
+        [HttpGet("get-all-role")]
         public async Task<ActionResult<List<RoleDto>>> GetAll()
         {
             try
@@ -29,7 +29,7 @@ namespace BEWebtoon.Controllers
             }
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("get-role-by-id/{id}")]
         public async Task<ActionResult<RoleDto>> GetRolesById(int id)
         {
             try
@@ -56,7 +56,7 @@ namespace BEWebtoon.Controllers
 
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("update-role/{id}")]
         public async Task<IActionResult> UpdateRole(UpdateRoleDto RoleDto)
         {
             try
@@ -76,7 +76,7 @@ namespace BEWebtoon.Controllers
         }
 
 
-        [HttpPost]
+        [HttpPost("create-role")]
         public async Task<IActionResult> CreateRoles(CreateRoleDto Roles)
         {
             try
@@ -91,7 +91,7 @@ namespace BEWebtoon.Controllers
                 return BadRequest(ex.ToString());
             }
         }
-        [HttpDelete("{id}")]
+        [HttpDelete("delete-role/{id}")]
         public async Task<IActionResult> DeleteRoles(int id)
         {
             try

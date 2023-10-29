@@ -45,5 +45,18 @@
                 throw new CustomException("Ban chua duoc phan quyen");
             }
         }
+        public bool CheckLogin()
+        {
+            var checkRoleId = GetSessionValue("UserId");
+
+            if (checkRoleId!=null)
+            {
+                return true;
+            }
+            else
+            {
+                throw new CustomException("Ban phai dang nhap de su dung chuc nang nay");
+            }
+        }
     }
 }

@@ -69,15 +69,18 @@ namespace BEWebtoon.Repositories
         }
         public async Task DeleteBook(int id)
         {
-            var book = await _dBContext.Books.FindAsync(id);
-            if (book != null)
+            if (_sessionManager.CheckRole(ROLE_CONSTANTS.Admin))
             {
-                _dBContext.Books.Remove(book);
-                await _dBContext.SaveChangesAsync();
-            }
-            else
-            {
-                throw new Exception("Khong tim thay sach voi id" + id);
+                var book = await _dBContext.Books.FindAsync(id);
+                if (book != null)
+                {
+                    _dBContext.Books.Remove(book);
+                    await _dBContext.SaveChangesAsync();
+                }
+                else
+                {
+                    throw new Exception("Khong tim thay sach voi id" + id);
+                }
             }
         }
 
@@ -91,6 +94,8 @@ namespace BEWebtoon.Repositories
                     .ThenInclude(x=>x.Authors)
                     .Include(x => x.CategoryBooks)
                     .ThenInclude(x => x.Categories)
+                    .Include(x=>x.Comments)
+                    .ThenInclude(x => x.UserProfiles)
                     .ToListAsync();
                 if (books != null)
                 {
@@ -107,7 +112,10 @@ namespace BEWebtoon.Repositories
                     .Include(x => x.BookFollows)
                     .ThenInclude(x => x.Authors)
                     .Include(x => x.CategoryBooks)
-                    .ThenInclude(x => x.Categories).ToListAsync();
+                    .ThenInclude(x => x.Categories)
+                    .Include(x => x.Comments)
+                             .ThenInclude(x => x.UserProfiles)
+                             .ToListAsync();
             if (!string.IsNullOrEmpty(request.keyword.TrimAndLower()))
                 query = query.Where(x => x.Title.ToLower().Contains(request.keyword.ToLower())
                                         || SearchHelper.ConvertToUnSign(x.Title).ToLower().Contains(request.keyword.ToLower())).ToList();
@@ -127,9 +135,14 @@ namespace BEWebtoon.Repositories
 
         public async Task<BookDto> GetById(int id)
         {
-            if (_sessionManager.CheckRole(ROLE_CONSTANTS.AdminAuthor))
-            {
-                var book = await _dBContext.Books.FindAsync(id);
+                var book = await _dBContext.Books
+                         .Include(b => b.BookFollows)
+                             .ThenInclude(bf => bf.Authors)
+                         .Include(b => b.CategoryBooks)
+                             .ThenInclude(cb => cb.Categories)
+                         .Include(x => x.Comments)
+                             .ThenInclude(x => x.UserProfiles)
+                         .FirstOrDefaultAsync(b => b.Id == id);
                 if (book != null)
                 {
 
@@ -139,10 +152,8 @@ namespace BEWebtoon.Repositories
                 }
                 else
                 {
-                    throw new Exception("Khong tim thay nguoi dung");
+                    throw new Exception("Khong tim thay sach");
                 }
-            }
-            return null;
         }
 
         public async Task UpdateBook(UpdateBookDto updateBookDto)

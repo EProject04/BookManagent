@@ -107,6 +107,27 @@ namespace BEWebtoon.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Followings",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<int>(type: "int", nullable: true),
+                    BookId = table.Column<int>(type: "int", nullable: true),
+                    CreatedDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    LastModifiedDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Followings", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Following_Book",
+                        column: x => x.BookId,
+                        principalTable: "Books",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "CategoryBooks",
                 columns: table => new
                 {
@@ -179,6 +200,12 @@ namespace BEWebtoon.Migrations
                 {
                     table.PrimaryKey("PK_UserProfiles", x => x.Id);
                     table.ForeignKey(
+                        name: "FK_Following_UserProfiles",
+                        column: x => x.Id,
+                        principalTable: "Followings",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
                         name: "FK_UserProfile_Author",
                         column: x => x.AuthorId,
                         principalTable: "Authors",
@@ -214,32 +241,6 @@ namespace BEWebtoon.Migrations
                         principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Comment_UserProfiles",
-                        column: x => x.UserId,
-                        principalTable: "UserProfiles",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Followings",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<int>(type: "int", nullable: true),
-                    BookId = table.Column<int>(type: "int", nullable: true),
-                    CreatedDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    LastModifiedDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Followings", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Following_Book",
-                        column: x => x.BookId,
-                        principalTable: "Books",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Following_UserProfiles",
                         column: x => x.UserId,
                         principalTable: "UserProfiles",
                         principalColumn: "Id");
@@ -301,11 +302,6 @@ namespace BEWebtoon.Migrations
                 column: "BookId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Followings_UserId",
-                table: "Followings",
-                column: "UserId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_UserProfiles_AuthorId",
                 table: "UserProfiles",
                 column: "AuthorId",
@@ -331,22 +327,22 @@ namespace BEWebtoon.Migrations
                 name: "Comments");
 
             migrationBuilder.DropTable(
-                name: "Followings");
-
-            migrationBuilder.DropTable(
                 name: "Categories");
 
             migrationBuilder.DropTable(
-                name: "Books");
+                name: "UserProfiles");
 
             migrationBuilder.DropTable(
-                name: "UserProfiles");
+                name: "Followings");
 
             migrationBuilder.DropTable(
                 name: "Authors");
 
             migrationBuilder.DropTable(
                 name: "Users");
+
+            migrationBuilder.DropTable(
+                name: "Books");
 
             migrationBuilder.DropTable(
                 name: "Roles");

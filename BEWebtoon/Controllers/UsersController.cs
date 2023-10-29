@@ -14,7 +14,7 @@ using Azure.Core;
 
 namespace BEWebtoon.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/users")]
     [ApiController]
     public class UsersController : ControllerBase
     {
@@ -25,7 +25,7 @@ namespace BEWebtoon.Controllers
             _userService = userService;
         }
 
-        [HttpGet]
+        [HttpGet("get-all-user")]
         public async Task<ActionResult<List<UserDto>>> GetAll()
         {
             try
@@ -38,7 +38,7 @@ namespace BEWebtoon.Controllers
             }
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("get-user-by-id/{id}")]
         public async Task<ActionResult<UserDto>> GetUsersById(int id)
         {
             try
@@ -65,7 +65,7 @@ namespace BEWebtoon.Controllers
 
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("update-user/{id}")]
         public async Task<IActionResult> UpdateUser(UpdateUserDto userDto)
         {
             try
@@ -85,7 +85,7 @@ namespace BEWebtoon.Controllers
         }
 
        
-        [HttpPost]
+        [HttpPost("create-user")]
         public async Task<IActionResult> CreateUsers(CreateUserDto users)
         {
             try
@@ -147,7 +147,7 @@ namespace BEWebtoon.Controllers
             }
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("delete-user/{id}")]
         public async Task<IActionResult> DeleteUsers(int id)
         {
             try

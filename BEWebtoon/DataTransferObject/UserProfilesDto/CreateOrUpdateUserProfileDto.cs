@@ -13,7 +13,6 @@ namespace BEWebtoon.DataTransferObject.UserProfilesDto
         [AllowedExtensions(new string[] { ".jpg", ".png", ".svg", ".jpeg" })]
         public IFormFile? File { get; set; }
         public string? ImagePath { get; set; }
-        public int? AuthorId { get; set; }
         public DateTimeOffset? DateOfBirth { get; set; }
     }
 }

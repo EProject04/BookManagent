@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BEWebtoon.Migrations
 {
     [DbContext(typeof(WebtoonDbContext))]
-    [Migration("20231017032030_Initial")]
+    [Migration("20231029142638_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -225,8 +225,6 @@ namespace BEWebtoon.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("BookId");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Followings");
                 });
@@ -446,14 +444,7 @@ namespace BEWebtoon.Migrations
                         .HasForeignKey("BookId")
                         .HasConstraintName("FK_Following_Book");
 
-                    b.HasOne("BEWebtoon.Models.UserProfile", "UserProfiles")
-                        .WithMany("Followings")
-                        .HasForeignKey("UserId")
-                        .HasConstraintName("FK_Following_UserProfiles");
-
                     b.Navigation("Books");
-
-                    b.Navigation("UserProfiles");
                 });
 
             modelBuilder.Entity("BEWebtoon.Models.User", b =>
@@ -473,6 +464,13 @@ namespace BEWebtoon.Migrations
                         .HasForeignKey("BEWebtoon.Models.UserProfile", "AuthorId")
                         .HasConstraintName("FK_UserProfile_Author");
 
+                    b.HasOne("BEWebtoon.Models.Following", "Followings")
+                        .WithOne("UserProfiles")
+                        .HasForeignKey("BEWebtoon.Models.UserProfile", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_Following_UserProfiles");
+
                     b.HasOne("BEWebtoon.Models.User", "Users")
                         .WithOne("UserProfiles")
                         .HasForeignKey("BEWebtoon.Models.UserProfile", "Id")
@@ -481,6 +479,8 @@ namespace BEWebtoon.Migrations
                         .HasConstraintName("FK_UserProfile_User");
 
                     b.Navigation("Authors");
+
+                    b.Navigation("Followings");
 
                     b.Navigation("Users");
                 });
@@ -508,6 +508,11 @@ namespace BEWebtoon.Migrations
                     b.Navigation("CategoryBooks");
                 });
 
+            modelBuilder.Entity("BEWebtoon.Models.Following", b =>
+                {
+                    b.Navigation("UserProfiles");
+                });
+
             modelBuilder.Entity("BEWebtoon.Models.Role", b =>
                 {
                     b.Navigation("Users");
@@ -521,8 +526,6 @@ namespace BEWebtoon.Migrations
             modelBuilder.Entity("BEWebtoon.Models.UserProfile", b =>
                 {
                     b.Navigation("Comments");
-
-                    b.Navigation("Followings");
                 });
 #pragma warning restore 612, 618
         }

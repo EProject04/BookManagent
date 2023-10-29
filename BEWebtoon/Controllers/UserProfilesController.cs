@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BEWebtoon.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/user-profiles")]
     [ApiController]
     public class UserProfilesController : ControllerBase
     {
@@ -17,7 +17,7 @@ namespace BEWebtoon.Controllers
         {
             _userProfileService= userProfileService;
         }
-        [HttpGet]
+        [HttpGet("get-all-userprofile")]
         public async Task<ActionResult<List<UserProfileDto>>> GetAll()
         {
             try
@@ -30,7 +30,7 @@ namespace BEWebtoon.Controllers
             }
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("get-userprofile-by-id/{id}")]
         public async Task<ActionResult<UserProfileDto>> GetUserProfilesById(int id)
         {
             try
@@ -57,7 +57,7 @@ namespace BEWebtoon.Controllers
 
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("update-userprofile/{id}")]
         public async Task<IActionResult> UpdateUserProfile([FromForm]UpdateUserProfileDto userProfileDto)
         {
             try
@@ -77,7 +77,7 @@ namespace BEWebtoon.Controllers
         }
 
      
-        [HttpDelete("{id}")]
+        [HttpDelete("delete-userprofile/{id}")]
         public async Task<IActionResult> DeleteUserProfiles(int id)
         {
             try

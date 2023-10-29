@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using BEWebtoon.DataTransferObject.CommentsDto;
 using BEWebtoon.DataTransferObject.UserProfilesDto;
 using BEWebtoon.Helpers;
 using BEWebtoon.Models;
@@ -9,6 +10,7 @@ using BEWebtoon.WebtoonDBContext;
 using IOC.ApplicationLayer.Utilities;
 using IOCBEWebtoon.Utilities;
 using Microsoft.EntityFrameworkCore;
+using System.Net;
 
 namespace BEWebtoon.Repositories
 {
@@ -101,8 +103,10 @@ namespace BEWebtoon.Repositories
 
         public async Task UpdateUserProfile(UpdateUserProfileDto updateUserProfileDto)
         {
+            using var transaction = await _dBContext.Database.BeginTransactionAsync();
+
             var userProfile = await _dBContext.UserProfiles.Where(x => x.Id == updateUserProfileDto.Id).FirstOrDefaultAsync();
-            var data = _mapper.Map<UserProfile>(userProfile);
+
             if (updateUserProfileDto.File != null && updateUserProfileDto.File.Length > 0)
             {
                
@@ -111,9 +115,54 @@ namespace BEWebtoon.Repositories
                     if (File.Exists(Path.Combine(updateUserProfileDto.ImagePath)))
                         File.Delete(Path.Combine(updateUserProfileDto.ImagePath));
                 }
-                data.ImagePath = await FileHelper.SaveFile(updateUserProfileDto.File, "UserProfileImage");
+                userProfile.ImagePath = await FileHelper.SaveFile(updateUserProfileDto.File, "UserProfileImage");
             }
-            await _dBContext.SaveChangesAsync();
+            try
+            {
+                if (userProfile.FistName != null)
+                {
+                    userProfile.FistName = updateUserProfileDto.FistName;
+                }
+                if (userProfile.LastName != null)
+                {
+                    userProfile.LastName = updateUserProfileDto.LastName;
+                }
+                if (userProfile.LastName != null && userProfile.FistName != null)
+                {
+                    userProfile.FullName = updateUserProfileDto.FistName + ' ' + updateUserProfileDto.LastName;
+                }
+                if (userProfile.PhoneNumber != null)
+                {
+                    userProfile.PhoneNumber = updateUserProfileDto.PhoneNumber;
+                }
+                if (userProfile.Address != null)
+                {
+                    userProfile.Address = updateUserProfileDto.Address;
+                }
+                if (userProfile.ImagePath != null)
+                {
+                    userProfile.ImagePath = updateUserProfileDto.ImagePath;
+                }
+                if (userProfile.Gender != null)
+                {
+                    userProfile.Gender = updateUserProfileDto.Gender;
+                }
+                if (userProfile.DateOfBirth != null)
+                {
+                    userProfile.DateOfBirth = updateUserProfileDto.DateOfBirth;
+                }
+                if (userProfile.Email != null)
+                {
+                    userProfile.Email = updateUserProfileDto.Email;
+                }
+                await _dBContext.SaveChangesAsync();
+                await transaction.CommitAsync();
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                throw new CustomException("Failed to update the comment: " + ex.Message);
+            }
         }
     }
 }

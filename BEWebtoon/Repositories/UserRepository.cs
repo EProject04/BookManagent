@@ -50,6 +50,7 @@ namespace BEWebtoon.Repositories
                                 Email = data.Email,
 
                             };
+                           
                             if (userDto.RoleId == 2)
                             {
                                 var author = new Author
@@ -58,9 +59,15 @@ namespace BEWebtoon.Repositories
                                 };
                                 userProfile.Authors = author;
                             }
+                            var following = new Following
+                            {
+                                UserId = userProfile.Id,
+                            };
+                            userProfile.Followings = following;
+
                             await _dBContext.UserProfiles.AddAsync(userProfile);
                             await _dBContext.SaveChangesAsync();
-
+                          
                         }
                         catch (Exception ex)
                         {

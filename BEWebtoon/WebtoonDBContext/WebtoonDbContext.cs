@@ -82,8 +82,8 @@ namespace BEWebtoon.WebtoonDBContext
             modelBuilder.Entity<Following>(entity =>
             {
                 entity.HasOne(d => d.UserProfiles)
-                    .WithMany(p => p.Followings)
-                    .HasForeignKey(a => a.UserId)
+                    .WithOne(p => p.Followings)
+                    .HasForeignKey<UserProfile>(u => u.Id)
                     .HasConstraintName("FK_Following_UserProfiles");
 
                 entity.HasOne(d => d.Books)
