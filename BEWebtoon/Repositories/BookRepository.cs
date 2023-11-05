@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
+using BEWebtoon.DataTransferObject.AuthorDto;
 using BEWebtoon.DataTransferObject.BooksDto;
+using BEWebtoon.DataTransferObject.CategoriesDto;
 using BEWebtoon.Helpers;
 using BEWebtoon.Models;
 using BEWebtoon.Pagination;
@@ -101,6 +103,21 @@ namespace BEWebtoon.Repositories
                 {
                     booksDto = _mapper.Map<List<Book>, List<BookDto>>(books);
                 }
+                foreach (var item in booksDto)
+                {
+                    if (item.ImagePath != null)
+                    {
+                        if (File.Exists(Path.Combine(item.ImagePath)))
+                        {
+                            byte[] imageArray = System.IO.File.ReadAllBytes(Path.Combine(item.ImagePath));
+                            item.Image = imageArray;
+                        }
+                        else
+                            item.Image = null;
+                    }
+                    else
+                        item.Image = null;
+                }
                 return booksDto;
             }
             return null;
@@ -130,6 +147,21 @@ namespace BEWebtoon.Repositories
                                                            || SearchHelper.ConvertToUnSign(bf.Categories.CategoryName).TrimAndLower().Contains(request.CategoryName.TrimAndLower()))).ToList();
             }
             var items = _mapper.Map<IEnumerable<BookDto>>(query);
+            foreach (var item in items)
+            {
+                if (item.ImagePath != null)
+                {
+                    if (File.Exists(Path.Combine(item.ImagePath)))
+                    {
+                        byte[] imageArray = System.IO.File.ReadAllBytes(Path.Combine(item.ImagePath));
+                        item.Image = imageArray;
+                    }
+                    else
+                        item.Image = null;
+                }
+                else
+                    item.Image = null;
+            }
             return PagedResult<BookDto>.ToPagedList(items, request.PageIndex, request.PageSize);
         }
 
@@ -144,10 +176,22 @@ namespace BEWebtoon.Repositories
                              .ThenInclude(x => x.UserProfiles)
                          .FirstOrDefaultAsync(b => b.Id == id);
                 if (book != null)
-                {
+            {
 
-                    BookDto bookDto = _mapper.Map<Book, BookDto>(book);
-                    return bookDto;
+                BookDto bookDto = _mapper.Map<Book, BookDto>(book);
+                if (book.ImagePath != null)
+                {
+                    if (File.Exists(Path.Combine(book.ImagePath)))
+                    {
+                        byte[] imageArray = System.IO.File.ReadAllBytes(Path.Combine(book.ImagePath));
+                        bookDto.Image = imageArray;
+                    }
+                    else
+                        bookDto.Image = null;
+                }
+                else
+                    bookDto.Image = null;
+                return bookDto;
 
                 }
                 else

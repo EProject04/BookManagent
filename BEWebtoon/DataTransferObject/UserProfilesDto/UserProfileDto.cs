@@ -10,6 +10,7 @@
         public string? Email { get; set; }
         public bool? Gender { get; set; }
         public string? ImagePath { get; set; }
+        public byte[]? Image { get; set; }
         public int? AuthorId { get; set; }
         public string? RoleName { get; set; }
         public DateTimeOffset? DateOfBirth { get; set; }
