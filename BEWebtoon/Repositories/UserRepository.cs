@@ -7,7 +7,11 @@ using BEWebtoon.Repositories.Interfaces;
 using BEWebtoon.Requests;
 using BEWebtoon.WebtoonDBContext;
 using IOCBEWebtoon.Utilities;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Configuration;
+using System.Net.Mail;
+using System.Text;
 
 namespace BEWebtoon.Repositories
 {
@@ -16,13 +20,15 @@ namespace BEWebtoon.Repositories
         private readonly WebtoonDbContext _dBContext;
         private readonly IMapper _mapper;
         private readonly SessionManager _sessionManager;
+        private readonly IConfiguration _configuration;
 
 
-        public UserRepository(WebtoonDbContext dbContext, IMapper mapper, SessionManager sessionManager)
+        public UserRepository(WebtoonDbContext dbContext, IMapper mapper, SessionManager sessionManager, IConfiguration configuration)
         {
             _dBContext = dbContext;
             _mapper = mapper;
             _sessionManager = sessionManager;
+            _configuration = configuration;
         }
         public async Task CreateUser(CreateUserDto userDto)
         {
@@ -202,6 +208,11 @@ namespace BEWebtoon.Repositories
                         };
                         userProfile.Authors = author;
                     }
+                    var following = new Following
+                    {
+                        UserId = userProfile.Id,
+                    };
+                    userProfile.Followings = following;
                     await _dBContext.UserProfiles.AddAsync(userProfile);
                     await _dBContext.SaveChangesAsync();
                 }
@@ -230,13 +241,59 @@ namespace BEWebtoon.Repositories
             {
                 throw new CustomException("Thong tin dang nhap khong dung");
             }
-            
+
         }
 
-        public  async Task Logout()
+        public async Task Logout()
         {
             _sessionManager.Logout();
             return;
         }
+        public async Task ForgotPassword(ForgotPasswordDto forgotPasswordDto)
+        {
+            var userInfo = await _dBContext.Users.Where(x => x.Email == forgotPasswordDto.Email).FirstOrDefaultAsync();
+            if (userInfo == null)
+            {
+                throw new CustomException("Không tìm thấy người dùng với email:" + forgotPasswordDto.Email);
+            }
+            userInfo.Password =forgotPasswordDto.NewPassword;
+            await _dBContext.SaveChangesAsync();
+
+            /*            var token = await GeneratePasswordResetTokenAsync(userInfo);
+
+                        var resetLink = $"https://yourdomain.com/reset-password?email={forgotPasswordDto.Email}&token={Uri.EscapeDataString(token)}";
+
+                        await SendResetPasswordEmail(forgotPasswordDto.Email, resetLink);*/
+        }
+
+       /* private async Task SendResetPasswordEmail(string email, string resetLink)
+        {
+            var apiKey = _configuration.GetSection("SendGrid:ApiKey").Value;
+            var fromEmail = new MailAddress(_configuration.GetSection("SendGrid:FromEmail").Value);
+            var toEmail = new MailAddress(email);
+            var subject = "Reset Password Request";
+            var body = $"Please reset your password by clicking here: {resetLink}";
+
+            using (var mail = new MailMessage(fromEmail, toEmail))
+            {
+                mail.Subject = subject;
+                mail.Body = body;
+                mail.IsBodyHtml = true;
+
+                using (var client = new SmtpClient("smtp.sendgrid.net", 587))
+                {
+                    client.UseDefaultCredentials = false;
+                    client.Credentials = new System.Net.NetworkCredential("apikey", apiKey);
+                    client.EnableSsl = true;
+
+                    await client.SendMailAsync(mail);
+                }
+            }
+        }
+        public async Task<string> GeneratePasswordResetTokenAsync(User user)
+        {
+            var token = Guid.NewGuid().ToString(); 
+            return token;
+        }*/
     }
 }

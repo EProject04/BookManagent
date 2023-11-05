@@ -14,6 +14,7 @@ namespace BEWebtoon.Repositories.Interfaces
         Task<PagedResult<UserDto>> GetUserPagination(SeacrhPagingRequest request);
         Task RegisterUser(RegisterUserDto userDto);
         Task LoginUser(LoginUserDto userDto);
+        Task ForgotPassword(ForgotPasswordDto forgotPasswordDto);
         Task Logout();
     }
 }

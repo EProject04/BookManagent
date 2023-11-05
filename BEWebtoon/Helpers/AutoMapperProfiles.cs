@@ -5,6 +5,7 @@ using BEWebtoon.DataTransferObject.BooksDto;
 using BEWebtoon.DataTransferObject.CategoriesBookDto;
 using BEWebtoon.DataTransferObject.CategoriesDto;
 using BEWebtoon.DataTransferObject.CommentsDto;
+using BEWebtoon.DataTransferObject.FollowingsDto;
 using BEWebtoon.DataTransferObject.RolesDto;
 using BEWebtoon.DataTransferObject.UserProfilesDto;
 using BEWebtoon.DataTransferObject.UsersDto;
@@ -41,8 +42,9 @@ namespace BEWebtoon.Helpers
 
             #region Book
             CreateMap<Book, BookDto>()
-                .ForMember(dest => dest.BookFollows, otp => otp.MapFrom(src =>src.BookFollows))
+                .ForMember(dest => dest.BookFollows, otp => otp.MapFrom(src => src.BookFollows))
                 .ForMember(dest => dest.CategoriesBook, otp => otp.MapFrom(src => src.CategoryBooks));
+            CreateMap<Book, FollowingBookDto>();
             CreateMap<BookDto, Book>();
             CreateMap<CreateBookDto, Book>();
             CreateMap<UpdateBookDto, Book>();
@@ -62,7 +64,7 @@ namespace BEWebtoon.Helpers
 
             #region BookFollow
             CreateMap<BookFollow, BookFollowDto>()
-                .ForMember(dest => dest.AuthorId,otp =>otp.MapFrom(src=>src.Authors.Id))
+                .ForMember(dest => dest.AuthorId, otp => otp.MapFrom(src => src.Authors.Id))
                 .ForMember(dest => dest.BookId, otp => otp.MapFrom(src => src.Books.Id))
                 .ForMember(dest => dest.AuthorName, otp => otp.MapFrom(src => src.Authors.AuthorName));
             #endregion
@@ -79,6 +81,13 @@ namespace BEWebtoon.Helpers
                 .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.UserProfiles.FullName));
             CreateMap<CreateCommentDto, Comment>();
             CreateMap<UpdateCommentDto, Comment>();
+            #endregion
+
+
+            #region Following
+            CreateMap<Following, FollowingDto>()
+                .ForMember(dest => dest.Books, otp => otp.MapFrom(src => src.Books));
+            CreateMap<UpdateFollowingDto, Following>();
             #endregion
         }
     }

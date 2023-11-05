@@ -84,7 +84,24 @@ namespace BEWebtoon.Controllers
             }
         }
 
-       
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordDto forgotPasswordDto)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                    return BadRequest("Du lieu khong hop le");
+                await _userService.ForgotPassword(forgotPasswordDto);
+                return Ok(200);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.ToString());
+            }
+
+        }
+
+
         [HttpPost("create-user")]
         public async Task<IActionResult> CreateUsers(CreateUserDto users)
         {

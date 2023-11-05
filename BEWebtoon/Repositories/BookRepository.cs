@@ -1,7 +1,5 @@
 ﻿using AutoMapper;
-using BEWebtoon.DataTransferObject.AuthorDto;
 using BEWebtoon.DataTransferObject.BooksDto;
-using BEWebtoon.DataTransferObject.CategoriesDto;
 using BEWebtoon.Helpers;
 using BEWebtoon.Models;
 using BEWebtoon.Pagination;
@@ -176,7 +174,7 @@ namespace BEWebtoon.Repositories
                              .ThenInclude(x => x.UserProfiles)
                          .FirstOrDefaultAsync(b => b.Id == id);
                 if (book != null)
-            {
+                {
 
                 BookDto bookDto = _mapper.Map<Book, BookDto>(book);
                 if (book.ImagePath != null)

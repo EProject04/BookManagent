@@ -24,6 +24,11 @@ namespace BEWebtoon.Services
            await _userRepository.DeleteUser(id);
         }
 
+        public async Task ForgotPassword(ForgotPasswordDto forgotPasswordDto)
+        {
+            await _userRepository.ForgotPassword(forgotPasswordDto);
+        }
+
         public async Task<List<UserDto>> GetAll()
         {
             return  await _userRepository.GetAll();

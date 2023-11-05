@@ -30,6 +30,8 @@ builder.Services.AddTransient<ICategoryRepository, CategoryRepository>();
 builder.Services.AddTransient<ICategoryService, CategoryService>();
 builder.Services.AddTransient<ICommentRepository, CommentRepository>();
 builder.Services.AddTransient<ICommentService, CommentService>();
+builder.Services.AddTransient<IFollowingRepository, FollowingRepository>();
+builder.Services.AddTransient<IFollowingService, FollowingService>();
 builder.Services.AddControllers();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddHttpContextAccessor();
