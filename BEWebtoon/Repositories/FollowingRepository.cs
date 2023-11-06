@@ -9,6 +9,7 @@ using BEWebtoon.Requests;
 using BEWebtoon.WebtoonDBContext;
 using IOCBEWebtoon.Utilities;
 using Microsoft.EntityFrameworkCore;
+using System.Drawing.Printing;
 using System.Linq;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
@@ -115,6 +116,7 @@ namespace BEWebtoon.Repositories
         {
             if (_sessionManager.CheckLogin())
             {
+                var count = 0;
                 var query = await _dBContext.Followings
                             .Include(x => x.Books).ToListAsync();
                 var items = _mapper.Map<IEnumerable<FollowingDto>>(query);
@@ -125,6 +127,8 @@ namespace BEWebtoon.Repositories
                         if (!string.IsNullOrEmpty(request.keyword.TrimAndLower()))
                             item.Books = item.Books.Where(x => x.Title.ToLower().Contains(request.keyword.ToLower())
                                                     || SearchHelper.ConvertToUnSign(x.Title).ToLower().Contains(request.keyword.ToLower())).ToList();
+                        
+                        item.Books = item.Books.Skip((request.PageIndex - 1) * request.PageSize).Take(request.PageSize).ToList();
                         foreach (var i in item.Books)
                         {
                             
