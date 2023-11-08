@@ -44,7 +44,46 @@ namespace BEWebtoon.Migrations
                     b.ToTable("Authors");
                 });
 
-            modelBuilder.Entity("BEWebtoon.Models.AuthorBook", b =>
+            modelBuilder.Entity("BEWebtoon.Models.Book", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Content")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset>("CreatedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("FollowingId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ImagePath")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset?>("LastModifiedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<bool?>("Status")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FollowingId");
+
+                    b.ToTable("Books");
+                });
+
+            modelBuilder.Entity("BEWebtoon.Models.BookFollow", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -70,41 +109,7 @@ namespace BEWebtoon.Migrations
 
                     b.HasIndex("BookId");
 
-                    b.ToTable("AuthorBooks");
-                });
-
-            modelBuilder.Entity("BEWebtoon.Models.Book", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Content")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTimeOffset>("CreatedDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ImagePath")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTimeOffset?>("LastModifiedDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<bool?>("Status")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Title")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Books");
+                    b.ToTable("BookFollows");
                 });
 
             modelBuilder.Entity("BEWebtoon.Models.Category", b =>
@@ -175,9 +180,6 @@ namespace BEWebtoon.Migrations
                     b.Property<int?>("BookId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("BookId1")
-                        .HasColumnType("int");
-
                     b.Property<string>("CommentText")
                         .HasColumnType("nvarchar(max)");
 
@@ -197,10 +199,6 @@ namespace BEWebtoon.Migrations
 
                     b.HasIndex("BookId");
 
-                    b.HasIndex("BookId1")
-                        .IsUnique()
-                        .HasFilter("[BookId1] IS NOT NULL");
-
                     b.HasIndex("UserId");
 
                     b.ToTable("Comments");
@@ -214,9 +212,6 @@ namespace BEWebtoon.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("BookId")
-                        .HasColumnType("int");
-
                     b.Property<DateTimeOffset>("CreatedDate")
                         .HasColumnType("datetimeoffset");
 
@@ -228,9 +223,9 @@ namespace BEWebtoon.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BookId");
-
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserId")
+                        .IsUnique()
+                        .HasFilter("[UserId] IS NOT NULL");
 
                     b.ToTable("Followings");
                 });
@@ -344,11 +339,17 @@ namespace BEWebtoon.Migrations
                     b.Property<DateTimeOffset?>("DateOfBirth")
                         .HasColumnType("datetimeoffset");
 
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("FistName")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("FullName")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool?>("Gender")
+                        .HasColumnType("bit");
 
                     b.Property<string>("ImagePath")
                         .HasColumnType("nvarchar(max)");
@@ -362,9 +363,6 @@ namespace BEWebtoon.Migrations
                     b.Property<string>("PhoneNumber")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Sex")
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
 
                     b.HasIndex("AuthorId")
@@ -372,17 +370,38 @@ namespace BEWebtoon.Migrations
                         .HasFilter("[AuthorId] IS NOT NULL");
 
                     b.ToTable("UserProfiles");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Address = "Ha noi",
+                            CreatedDate = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Email = "SuperAdmin@gmail.com",
+                            FistName = "Super",
+                            LastName = "Admin"
+                        });
                 });
 
-            modelBuilder.Entity("BEWebtoon.Models.AuthorBook", b =>
+            modelBuilder.Entity("BEWebtoon.Models.Book", b =>
+                {
+                    b.HasOne("BEWebtoon.Models.Following", "Followings")
+                        .WithMany("Books")
+                        .HasForeignKey("FollowingId")
+                        .HasConstraintName("FK_Following_Book");
+
+                    b.Navigation("Followings");
+                });
+
+            modelBuilder.Entity("BEWebtoon.Models.BookFollow", b =>
                 {
                     b.HasOne("BEWebtoon.Models.Author", "Authors")
-                        .WithMany("AuthorBooks")
+                        .WithMany("BookFollows")
                         .HasForeignKey("AuthorId")
                         .HasConstraintName("FK_AuthorBook_Authors");
 
                     b.HasOne("BEWebtoon.Models.Book", "Books")
-                        .WithMany("AuthorBooks")
+                        .WithMany("BookFollows")
                         .HasForeignKey("BookId")
                         .HasConstraintName("FK_AuthorBook_UserProfiles");
 
@@ -419,10 +438,6 @@ namespace BEWebtoon.Migrations
                         .HasForeignKey("BookId")
                         .HasConstraintName("FK_Book_UserProfiles");
 
-                    b.HasOne("BEWebtoon.Models.Book", null)
-                        .WithOne("Commnets")
-                        .HasForeignKey("BEWebtoon.Models.Comment", "BookId1");
-
                     b.HasOne("BEWebtoon.Models.UserProfile", "UserProfiles")
                         .WithMany("Comments")
                         .HasForeignKey("UserId")
@@ -435,17 +450,10 @@ namespace BEWebtoon.Migrations
 
             modelBuilder.Entity("BEWebtoon.Models.Following", b =>
                 {
-                    b.HasOne("BEWebtoon.Models.Book", "Books")
-                        .WithMany("Followings")
-                        .HasForeignKey("BookId")
-                        .HasConstraintName("FK_Following_Book");
-
                     b.HasOne("BEWebtoon.Models.UserProfile", "UserProfiles")
-                        .WithMany("Followings")
-                        .HasForeignKey("UserId")
+                        .WithOne("Followings")
+                        .HasForeignKey("BEWebtoon.Models.Following", "UserId")
                         .HasConstraintName("FK_Following_UserProfiles");
-
-                    b.Navigation("Books");
 
                     b.Navigation("UserProfiles");
                 });
@@ -481,27 +489,28 @@ namespace BEWebtoon.Migrations
 
             modelBuilder.Entity("BEWebtoon.Models.Author", b =>
                 {
-                    b.Navigation("AuthorBooks");
+                    b.Navigation("BookFollows");
 
                     b.Navigation("UserProfiles");
                 });
 
             modelBuilder.Entity("BEWebtoon.Models.Book", b =>
                 {
-                    b.Navigation("AuthorBooks");
+                    b.Navigation("BookFollows");
 
                     b.Navigation("CategoryBooks");
 
                     b.Navigation("Comments");
-
-                    b.Navigation("Commnets");
-
-                    b.Navigation("Followings");
                 });
 
             modelBuilder.Entity("BEWebtoon.Models.Category", b =>
                 {
                     b.Navigation("CategoryBooks");
+                });
+
+            modelBuilder.Entity("BEWebtoon.Models.Following", b =>
+                {
+                    b.Navigation("Books");
                 });
 
             modelBuilder.Entity("BEWebtoon.Models.Role", b =>

@@ -25,10 +25,8 @@ namespace BEWebtoon.Repositories
 
         public async Task CreateRole(CreateRoleDto roleDto)
         {
-            var checkRoleId = _sessionManager.GetSessionValue("RoleId");
-            if (checkRoleId == "1")
+            if (_sessionManager.CheckRole(ROLE_CONSTANTS.Admin))
             {
-
                 var data = _mapper.Map<Role>(roleDto);
                 try
                 {
@@ -40,18 +38,13 @@ namespace BEWebtoon.Repositories
                     throw new CustomException($"Danh muc da ton tai" + ex);
                 }
             }
-            else
-            {
-                throw new CustomException("Ban chua duoc phan quyen");
-            }
+            
         }
 
         public async Task DeleteRole(int id)
         {
-            var checkRoleId = _sessionManager.GetSessionValue("RoleId");
-            if (checkRoleId == "1")
+            if (_sessionManager.CheckRole(ROLE_CONSTANTS.Admin))
             {
-
                 var role = await _dBContext.Roles.FindAsync(id);
                 if (role != null)
                 {
@@ -63,18 +56,12 @@ namespace BEWebtoon.Repositories
                     throw new Exception("Khong tim thay nguoi dung");
                 }
             }
-            else
-            {
-                throw new CustomException("Ban chua duoc phan quyen");
-            }
         }
 
         public async Task<List<RoleDto>> GetAll()
         {
-            var checkRoleId = _sessionManager.GetSessionValue("RoleId");
-            if (checkRoleId == "1")
+            if (_sessionManager.CheckRole(ROLE_CONSTANTS.Admin))
             {
-
                 List<RoleDto> rolesDto = new List<RoleDto>();
                 var roles = await _dBContext.Roles.ToListAsync();
                 if (roles != null)
@@ -83,18 +70,14 @@ namespace BEWebtoon.Repositories
                 }
                 return rolesDto;
             }
-            else
-            {
-                throw new CustomException("Ban chua duoc phan quyen");
-            }
+            return null;
+         
         }
 
         public async Task<RoleDto> GetById(int id)
         {
-            var checkRoleId = _sessionManager.GetSessionValue("RoleId");
-            if (checkRoleId == "1")
+            if (_sessionManager.CheckRole(ROLE_CONSTANTS.Admin))
             {
-
                 var role = await _dBContext.Roles.FindAsync(id);
                 if (role != null)
                 {
@@ -108,18 +91,14 @@ namespace BEWebtoon.Repositories
                     throw new Exception("Khong tim thay nguoi dung");
                 }
             }
-            else
-            {
-                throw new CustomException("Ban chua duoc phan quyen");
-            }
+            return null;
+            
         }
 
         public async Task<PagedResult<RoleDto>> GetRolePagination(SeacrhPagingRequest request)
         {
-            var checkRoleId = _sessionManager.GetSessionValue("RoleId");
-            if (checkRoleId == "1")
+            if (_sessionManager.CheckRole(ROLE_CONSTANTS.Admin))
             {
-
                 var query = await _dBContext.Roles.ToListAsync();
                 if (!string.IsNullOrEmpty(request.keyword))
                     query = query.Where(x => x.RoleName.ToLower().Contains(request.keyword.ToLower())
@@ -127,18 +106,13 @@ namespace BEWebtoon.Repositories
                 var items = _mapper.Map<IEnumerable<RoleDto>>(query);
                 return PagedResult<RoleDto>.ToPagedList(items, request.PageIndex, request.PageSize);
             }
-            else
-            {
-                throw new CustomException("Ban chua duoc phan quyen");
-            }
+            return null;
         }
 
         public async Task UpdateRole(UpdateRoleDto roleDto)
         {
-            var checkRoleId = _sessionManager.GetSessionValue("RoleId");
-            if (checkRoleId == "1")
+            if (_sessionManager.CheckRole(ROLE_CONSTANTS.Admin))
             {
-
                 var role = await _dBContext.Roles.Where(x => x.Id == roleDto.Id).FirstOrDefaultAsync();
                 if (role != null)
                 {
@@ -150,10 +124,6 @@ namespace BEWebtoon.Repositories
                 {
                     throw new Exception("Khong tim thay nguoi dung");
                 }
-            }
-            else
-            {
-                throw new CustomException("Ban chua duoc phan quyen");
             }
         }
     }

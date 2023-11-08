@@ -10,10 +10,10 @@ namespace BEWebtoon.Models
         public string? Content { get; set; }
         public string? ImagePath { get; set; }
         public bool? Status { get; set; }
-        public virtual Comment? Commnets { get; set; }
+        public int? FollowingId { get; set; }
         public virtual ICollection<Comment>? Comments { get; set; }
-        public virtual ICollection<Following>? Followings { get; set; }
-        public virtual ICollection<AuthorBook>? AuthorBooks { get; set; }
+        public virtual Following? Followings { get; set; }
+        public virtual ICollection<BookFollow>? BookFollows { get; set; }
         public virtual ICollection<CategoryBook>? CategoryBooks { get; set; }
 
 

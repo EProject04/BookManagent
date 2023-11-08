@@ -16,8 +16,5 @@
             set { _pageSize = value; }
         }
 
-        public string? SortField { get; set; }
-        public int SortOrder { get; set; }
-        public bool? IsPaging { get; set; } = true;
     }
 }

@@ -11,13 +11,14 @@ namespace BEWebtoon.Models
         public string? FullName { get; set; }
         public string? Address { get; set; }
         public string? PhoneNumber { get; set; }
-        public string? Sex { get; set; }
+        public string? Email { get; set; }
+        public bool? Gender { get; set; }
         public string? ImagePath { get; set; }
         public int? AuthorId { get; set; }
         public DateTimeOffset? DateOfBirth { get; set; }
         public virtual User? Users { get; set; }
         public virtual Author? Authors { get; set; }
         public virtual ICollection<Comment>? Comments { get; set; }
-        public virtual ICollection<Following>? Followings { get; set; }
+        public virtual Following? Followings { get; set; }
     }
 }

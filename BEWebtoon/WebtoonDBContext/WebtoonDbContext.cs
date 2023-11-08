@@ -16,7 +16,7 @@ namespace BEWebtoon.WebtoonDBContext
         public DbSet<Book> Books { get; set; }
         public DbSet<Following> Followings { get; set; }
         public DbSet<Author> Authors { get; set; }
-        public DbSet<AuthorBook> AuthorBooks { get; set; }
+        public DbSet<BookFollow> BookFollows { get; set; }
         public DbSet<CategoryBook> CategoryBooks { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<Role> Roles { get; set; }
@@ -57,6 +57,11 @@ namespace BEWebtoon.WebtoonDBContext
                     .WithOne(p => p.UserProfiles)
                     .HasForeignKey<UserProfile>(a => a.AuthorId)
                     .HasConstraintName("FK_UserProfile_Author");
+
+                entity.HasOne(d => d.Followings)
+                    .WithOne(p => p.UserProfiles)
+                    .HasForeignKey<Following>(a => a.UserId)
+                    .HasConstraintName("FK_Following_UserProfiles");
             });
             modelBuilder.Entity<User>(entity =>
             {
@@ -81,26 +86,21 @@ namespace BEWebtoon.WebtoonDBContext
             });
             modelBuilder.Entity<Following>(entity =>
             {
-                entity.HasOne(d => d.UserProfiles)
-                    .WithMany(p => p.Followings)
-                    .HasForeignKey(a => a.UserId)
-                    .HasConstraintName("FK_Following_UserProfiles");
-
-                entity.HasOne(d => d.Books)
-                    .WithMany(p => p.Followings)
-                    .HasForeignKey(a => a.BookId)
+                entity.HasMany(d => d.Books)
+                    .WithOne(p => p.Followings)
+                    .HasForeignKey(a => a.FollowingId)
                     .HasConstraintName("FK_Following_Book");
 
             });
-            modelBuilder.Entity<AuthorBook>(entity =>
+            modelBuilder.Entity<BookFollow>(entity =>
             {
                 entity.HasOne(d => d.Authors)
-                    .WithMany(p => p.AuthorBooks)
+                    .WithMany(p => p.BookFollows)
                     .HasForeignKey(a => a.AuthorId)
                     .HasConstraintName("FK_AuthorBook_Authors");
 
                 entity.HasOne(d => d.Books)
-                    .WithMany(p => p.AuthorBooks)
+                    .WithMany(p => p.BookFollows)
                     .HasForeignKey(a => a.BookId)
                     .HasConstraintName("FK_AuthorBook_UserProfiles");
 
@@ -125,6 +125,9 @@ namespace BEWebtoon.WebtoonDBContext
                 );
             modelBuilder.Entity<User>().HasData(
                 new User { Id=1, Username="SA", Password="1", Email="SuperAdmin@gmail.com", RoleId = 1}
+                );
+            modelBuilder.Entity<UserProfile>().HasData(
+                new UserProfile { Id = 1, FistName="Super", LastName="Admin", Address="Ha noi", Email = "SuperAdmin@gmail.com" }
                 );
         }
     }

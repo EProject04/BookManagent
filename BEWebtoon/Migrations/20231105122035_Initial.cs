@@ -29,25 +29,6 @@ namespace BEWebtoon.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Books",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Title = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Content = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ImagePath = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Status = table.Column<bool>(type: "bit", nullable: true),
-                    CreatedDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    LastModifiedDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Books", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Categories",
                 columns: table => new
                 {
@@ -81,7 +62,109 @@ namespace BEWebtoon.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "AuthorBooks",
+                name: "Users",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Password = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Username = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    RoleId = table.Column<int>(type: "int", nullable: true),
+                    CreatedDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    LastModifiedDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Users", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_User_Role",
+                        column: x => x.RoleId,
+                        principalTable: "Roles",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserProfiles",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false),
+                    FistName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LastName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FullName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Gender = table.Column<bool>(type: "bit", nullable: true),
+                    ImagePath = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AuthorId = table.Column<int>(type: "int", nullable: true),
+                    DateOfBirth = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    CreatedDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    LastModifiedDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserProfiles", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UserProfile_Author",
+                        column: x => x.AuthorId,
+                        principalTable: "Authors",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_UserProfile_User",
+                        column: x => x.Id,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Followings",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<int>(type: "int", nullable: true),
+                    CreatedDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    LastModifiedDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Followings", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Following_UserProfiles",
+                        column: x => x.UserId,
+                        principalTable: "UserProfiles",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Books",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Content = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ImagePath = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Status = table.Column<bool>(type: "bit", nullable: true),
+                    FollowingId = table.Column<int>(type: "int", nullable: true),
+                    CreatedDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    LastModifiedDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Books", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Following_Book",
+                        column: x => x.FollowingId,
+                        principalTable: "Followings",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "BookFollows",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -93,7 +176,7 @@ namespace BEWebtoon.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AuthorBooks", x => x.Id);
+                    table.PrimaryKey("PK_BookFollows", x => x.Id);
                     table.ForeignKey(
                         name: "FK_AuthorBook_Authors",
                         column: x => x.AuthorId,
@@ -135,62 +218,6 @@ namespace BEWebtoon.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Users",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Password = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Username = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    RoleId = table.Column<int>(type: "int", nullable: true),
-                    CreatedDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    LastModifiedDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Users", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_User_Role",
-                        column: x => x.RoleId,
-                        principalTable: "Roles",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "UserProfiles",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false),
-                    FistName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    LastName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    FullName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Sex = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ImagePath = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    AuthorId = table.Column<int>(type: "int", nullable: true),
-                    DateOfBirth = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
-                    CreatedDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    LastModifiedDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_UserProfiles", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_UserProfile_Author",
-                        column: x => x.AuthorId,
-                        principalTable: "Authors",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_UserProfile_User",
-                        column: x => x.Id,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Comments",
                 columns: table => new
                 {
@@ -200,7 +227,6 @@ namespace BEWebtoon.Migrations
                     Rate = table.Column<int>(type: "int", nullable: true),
                     UserId = table.Column<int>(type: "int", nullable: true),
                     BookId = table.Column<int>(type: "int", nullable: true),
-                    BookId1 = table.Column<int>(type: "int", nullable: true),
                     CreatedDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     LastModifiedDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
                 },
@@ -214,37 +240,6 @@ namespace BEWebtoon.Migrations
                         principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Comment_UserProfiles",
-                        column: x => x.UserId,
-                        principalTable: "UserProfiles",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Comments_Books_BookId1",
-                        column: x => x.BookId1,
-                        principalTable: "Books",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Followings",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<int>(type: "int", nullable: true),
-                    BookId = table.Column<int>(type: "int", nullable: true),
-                    CreatedDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    LastModifiedDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Followings", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Following_Book",
-                        column: x => x.BookId,
-                        principalTable: "Books",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Following_UserProfiles",
                         column: x => x.UserId,
                         principalTable: "UserProfiles",
                         principalColumn: "Id");
@@ -265,15 +260,25 @@ namespace BEWebtoon.Migrations
                 columns: new[] { "Id", "CreatedDate", "Email", "LastModifiedDate", "Password", "RoleId", "Username" },
                 values: new object[] { 1, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "SuperAdmin@gmail.com", null, "1", 1, "SA" });
 
+            migrationBuilder.InsertData(
+                table: "UserProfiles",
+                columns: new[] { "Id", "Address", "AuthorId", "CreatedDate", "DateOfBirth", "Email", "FistName", "FullName", "Gender", "ImagePath", "LastModifiedDate", "LastName", "PhoneNumber" },
+                values: new object[] { 1, "Ha noi", null, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), null, "SuperAdmin@gmail.com", "Super", null, null, null, null, "Admin", null });
+
             migrationBuilder.CreateIndex(
-                name: "IX_AuthorBooks_AuthorId",
-                table: "AuthorBooks",
+                name: "IX_BookFollows_AuthorId",
+                table: "BookFollows",
                 column: "AuthorId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_AuthorBooks_BookId",
-                table: "AuthorBooks",
+                name: "IX_BookFollows_BookId",
+                table: "BookFollows",
                 column: "BookId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Books_FollowingId",
+                table: "Books",
+                column: "FollowingId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_CategoryBooks_BookId",
@@ -291,26 +296,16 @@ namespace BEWebtoon.Migrations
                 column: "BookId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Comments_BookId1",
-                table: "Comments",
-                column: "BookId1",
-                unique: true,
-                filter: "[BookId1] IS NOT NULL");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Comments_UserId",
                 table: "Comments",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Followings_BookId",
-                table: "Followings",
-                column: "BookId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Followings_UserId",
                 table: "Followings",
-                column: "UserId");
+                column: "UserId",
+                unique: true,
+                filter: "[UserId] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserProfiles_AuthorId",
@@ -329,7 +324,7 @@ namespace BEWebtoon.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "AuthorBooks");
+                name: "BookFollows");
 
             migrationBuilder.DropTable(
                 name: "CategoryBooks");
@@ -338,13 +333,13 @@ namespace BEWebtoon.Migrations
                 name: "Comments");
 
             migrationBuilder.DropTable(
-                name: "Followings");
-
-            migrationBuilder.DropTable(
                 name: "Categories");
 
             migrationBuilder.DropTable(
                 name: "Books");
+
+            migrationBuilder.DropTable(
+                name: "Followings");
 
             migrationBuilder.DropTable(
                 name: "UserProfiles");
