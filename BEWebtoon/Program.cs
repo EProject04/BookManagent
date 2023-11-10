@@ -7,7 +7,6 @@ using BEWebtoon.Services;
 using BEWebtoon.Repositories.Interfaces;
 using BEWebtoon.Services.Interfaces;
 using Microsoft.Extensions.FileProviders;
-using Microsoft.AspNetCore.Hosting;
 
 var allowSpecificOrigins = "_allowSpecificOrigins";
 var builder = WebApplication.CreateBuilder(args);
@@ -93,6 +92,8 @@ app.UseStaticFiles(new StaticFileOptions
         Path.Combine(Directory.GetCurrentDirectory(), "resource/category/images")),
     RequestPath = "/category"
 });
+
+app.UseStaticFiles();
 
 app.UseHttpsRedirection();
 

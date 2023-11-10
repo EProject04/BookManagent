@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using BEWebtoon.DataTransferObject.AuthorDto;
-using BEWebtoon.DataTransferObject.CategoriesDto;
 using BEWebtoon.Helpers;
 using BEWebtoon.Models;
 using BEWebtoon.Pagination;
@@ -23,24 +22,6 @@ namespace BEWebtoon.Repositories
             _mapper = mapper;
             _sessionManager = sessionManager;
         }
-
-        public async Task CreateAuthor(CreateAuthorDto createAuthorDto)
-        {
-            if (_sessionManager.CheckRole(ROLE_CONSTANTS.Admin))
-            {
-                var data = _mapper.Map<Author>(createAuthorDto);
-                try
-                {
-                    await _dBContext.Authors.AddAsync(data);
-                    await _dBContext.SaveChangesAsync();
-                }
-                catch (Exception ex)
-                {
-                    throw new CustomException($"Da ton tai tac gia nay roi" + ex);
-                }
-            }
-        }
-
         public async Task DeleteAuthor(int id)
         {
             if (_sessionManager.CheckRole(ROLE_CONSTANTS.Admin))
@@ -53,7 +34,7 @@ namespace BEWebtoon.Repositories
                 }
                 else
                 {
-                    throw new Exception("Khong tim thay tac gia");
+                    throw new Exception("Khong tim thay nguoi dung");
                 }
             }
         }
@@ -97,7 +78,7 @@ namespace BEWebtoon.Repositories
                 }
                 else
                 {
-                    throw new Exception("Khong tim thay tac gia");
+                    throw new Exception("Khong tim thay nguoi dung");
                 }
             }
             return null;
@@ -115,7 +96,7 @@ namespace BEWebtoon.Repositories
                 }
                 else
                 {
-                    throw new Exception("Khong tim thay tac gia");
+                    throw new Exception("Khong tim thay nguoi dung");
                 }
             }
         }

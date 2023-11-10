@@ -1,7 +1,5 @@
 ﻿using BEWebtoon.DataTransferObject.AuthorDto;
-using BEWebtoon.DataTransferObject.CategoriesDto;
 using BEWebtoon.Requests;
-using BEWebtoon.Services;
 using BEWebtoon.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -76,21 +74,6 @@ namespace BEWebtoon.Controllers
             }
         }
 
-        [HttpPost("create_author")]
-        public async Task<IActionResult> CreateAuthor([FromForm] CreateAuthorDto creatAuthorDto)
-        {
-            try
-            {
-                if (!ModelState.IsValid)
-                    return BadRequest("Du lieu khong hop le");
-                await _authorService.CreateAuthor(creatAuthorDto);
-                return Ok(creatAuthorDto);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.ToString());
-            }
-        }
 
         [HttpDelete("delete-author/{id}")]
         public async Task<IActionResult> DeleteAuthors(int id)

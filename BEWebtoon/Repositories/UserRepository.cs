@@ -65,6 +65,11 @@ namespace BEWebtoon.Repositories
                                 };
                                 userProfile.Authors = author;
                             }
+                            var following = new Following
+                            {
+                                UserId = userProfile.Id,
+                            };
+                            userProfile.Followings = following;
 
                             await _dBContext.UserProfiles.AddAsync(userProfile);
                             await _dBContext.SaveChangesAsync();
@@ -80,6 +85,10 @@ namespace BEWebtoon.Repositories
                         throw new CustomException("Không tìm thấy quyền người dùng");
                     }
                 }
+
+
+                
+               
             }
         }
 
@@ -199,15 +208,21 @@ namespace BEWebtoon.Repositories
                         };
                         userProfile.Authors = author;
                     }
- 
+                    var following = new Following
+                    {
+                        UserId = userProfile.Id,
+                    };
+                    userProfile.Followings = following;
                     await _dBContext.UserProfiles.AddAsync(userProfile);
                     await _dBContext.SaveChangesAsync();
                 }
                 catch (Exception ex)
                 {
                     throw new CustomException($"Loi roi" + ex);
+
                 }
             }
+           
         }
 
         public async Task LoginUser(LoginUserDto userDto)
@@ -220,11 +235,13 @@ namespace BEWebtoon.Repositories
                     _sessionManager.SetSessionValue("RoleId", userInfo.RoleId.ToString());
                     _sessionManager.SetSessionValueInt("UserId", userInfo.Id);
                 }
+                
             }
             else
             {
                 throw new CustomException("Thong tin dang nhap khong dung");
             }
+
         }
 
         public async Task Logout()

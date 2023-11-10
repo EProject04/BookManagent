@@ -3,5 +3,6 @@
     public class CreateUserDto : CreateOrUpdateUserDto
     {
         public int? RoleId { get; set; }
+
     }
 }
