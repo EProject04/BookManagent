@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using BEWebtoon.DataTransferObject.AuthorDto;
+using BEWebtoon.DataTransferObject.CategoriesDto;
 using BEWebtoon.Helpers;
 using BEWebtoon.Models;
 using BEWebtoon.Pagination;
@@ -22,10 +23,28 @@ namespace BEWebtoon.Repositories
             _mapper = mapper;
             _sessionManager = sessionManager;
         }
+
+        public async Task CreateAuthor(CreateAuthorDto createAuthorDto)
+        {
+            //if (_sessionManager.CheckRole(ROLE_CONSTANTS.Admin))
+            //{
+                var data = _mapper.Map<Author>(createAuthorDto);
+                try
+                {
+                    await _dBContext.Authors.AddAsync(data);
+                    await _dBContext.SaveChangesAsync();
+                }
+                catch (Exception ex)
+                {
+                    throw new CustomException($"Da ton tai tac gia nay roi" + ex);
+                }
+            //}
+        }
+
         public async Task DeleteAuthor(int id)
         {
-            if (_sessionManager.CheckRole(ROLE_CONSTANTS.Admin))
-            {
+            //if (_sessionManager.CheckRole(ROLE_CONSTANTS.Admin))
+            //{
                 var author = await _dBContext.Authors.FindAsync(id);
                 if (author != null)
                 {
@@ -34,15 +53,15 @@ namespace BEWebtoon.Repositories
                 }
                 else
                 {
-                    throw new Exception("Khong tim thay nguoi dung");
+                    throw new Exception("Khong tim thay tac gia");
                 }
-            }
+            //}
         }
 
         public async Task<List<AuthorDto>> GetAll()
         {
-            if (_sessionManager.CheckRole(ROLE_CONSTANTS.Admin))
-            {
+            //if (_sessionManager.CheckRole(ROLE_CONSTANTS.Admin))
+            //{
                 List<AuthorDto> authorsDto = new List<AuthorDto>();
                 var authors = await _dBContext.Authors.ToListAsync();
                 if (authors != null)
@@ -50,7 +69,7 @@ namespace BEWebtoon.Repositories
                     authorsDto = _mapper.Map<List<Author>, List<AuthorDto>>(authors);
                 }
                 return authorsDto;
-            }
+            //}
             return null;
         }
 
@@ -66,8 +85,8 @@ namespace BEWebtoon.Repositories
 
         public async Task<AuthorDto> GetById(int id)
         {
-            if (_sessionManager.CheckRole(ROLE_CONSTANTS.Admin))
-            {
+            //if (_sessionManager.CheckRole(ROLE_CONSTANTS.Admin))
+            //{
                 var author = await _dBContext.Authors.FindAsync(id);
                 if (author != null)
                 {
@@ -78,16 +97,16 @@ namespace BEWebtoon.Repositories
                 }
                 else
                 {
-                    throw new Exception("Khong tim thay nguoi dung");
+                    throw new Exception("Khong tim thay tac gia");
                 }
-            }
+            //}
             return null;
         }
 
         public async Task UpdateAuthor(UpdateAuthorDto updateAuthorDto)
         {
-            if (_sessionManager.CheckRole(ROLE_CONSTANTS.Admin))
-            {
+            //if (_sessionManager.CheckRole(ROLE_CONSTANTS.Admin))
+            //{
                 var author = await _dBContext.Authors.Where(x => x.Id == updateAuthorDto.Id).FirstOrDefaultAsync();
                 if (author != null)
                 {
@@ -96,9 +115,9 @@ namespace BEWebtoon.Repositories
                 }
                 else
                 {
-                    throw new Exception("Khong tim thay nguoi dung");
+                    throw new Exception("Khong tim thay tac gia");
                 }
-            }
+            //}
         }
     }
 }

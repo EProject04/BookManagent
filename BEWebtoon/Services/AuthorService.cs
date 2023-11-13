@@ -1,5 +1,7 @@
 ﻿using BEWebtoon.DataTransferObject.AuthorDto;
+using BEWebtoon.DataTransferObject.CategoriesDto;
 using BEWebtoon.Pagination;
+using BEWebtoon.Repositories;
 using BEWebtoon.Repositories.Interfaces;
 using BEWebtoon.Requests;
 using BEWebtoon.Services.Interfaces;
@@ -12,6 +14,10 @@ namespace BEWebtoon.Services
         public AuthorService(IAuthorRepository repository)
         {
             _repository = repository;
+        }
+        public async Task CreateAuthor(CreateAuthorDto createCategoryDto)
+        {
+            await _repository.CreateAuthor(createCategoryDto);
         }
         public async Task DeleteAuthor(int id)
         {

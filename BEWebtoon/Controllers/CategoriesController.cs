@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BEWebtoon.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/categories")]
     [ApiController]
     public class CategoriesController : ControllerBase
     {
@@ -30,7 +30,7 @@ namespace BEWebtoon.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<CategoryDto>> GetCategorysById(int id)
+        public async Task<ActionResult<CategoryDto>> GetCategoryById(int id)
         {
             try
             {
@@ -75,9 +75,8 @@ namespace BEWebtoon.Controllers
             }
         }
 
-
         [HttpPost]
-        public async Task<IActionResult> CreateCategorys([FromForm] CreateCategoryDto creatCategoryDto)
+        public async Task<IActionResult> CreateCategory([FromForm] CreateCategoryDto creatCategoryDto)
         {
             try
             {
@@ -91,8 +90,9 @@ namespace BEWebtoon.Controllers
                 return BadRequest(ex.ToString());
             }
         }
+
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteCategorys(int id)
+        public async Task<IActionResult> DeleteCategory(int id)
         {
             try
             {

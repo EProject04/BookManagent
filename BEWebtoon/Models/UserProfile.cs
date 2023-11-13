@@ -19,6 +19,6 @@ namespace BEWebtoon.Models
         public virtual User? Users { get; set; }
         public virtual Author? Authors { get; set; }
         public virtual ICollection<Comment>? Comments { get; set; }
-        public virtual Following? Followings { get; set; }
+        public virtual ICollection<Following>? Followings { get; set; }
     }
 }
