@@ -179,6 +179,58 @@ namespace BEWebtoon.Repositories
            
         }
 
+        public async Task<List<BookDto>> GetFollowingBooks(int userprofileId)
+        {
+            if (_sessionManager.CheckLogin())
+            {
+                List<BookDto> followingsDto = new List<BookDto>();
+                var followingBooks = await _dBContext.Followings
+                                .Where(x => x.UserId == userprofileId).Include(x => x.BookId).ThenInclude(x => ).ToListAsync();
+                if (followingBooks != null)
+                {
+                    followingsDto = _mapper.Map<List<Following>, List<FollowingDto>>(followings);
+
+                }
+                foreach (var item in followingsDto)
+                {
+                    if (item.Books != null)
+                    {
+                        foreach (var i in item.Books)
+                        {
+                            if (i.ImagePath != null)
+                            {
+                                if (File.Exists(Path.Combine(i.ImagePath)))
+                                {
+                                    byte[] imageArray = System.IO.File.ReadAllBytes(Path.Combine(i.ImagePath));
+                                    i.Image = imageArray;
+                                }
+                                else
+                                    i.Image = null;
+                            }
+                            else
+                                i.Image = null;
+                        }
+                    }
+                }
+
+                return followingsDto;
+            }
+            else
+            {
+                throw new UnauthorizedAccessException("Người dùng chưa đăng nhập");
+            }
+        }
+
+        public Task Following(int userprofileId, int bookId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task UnFollowing(int userprofileId, int bookId)
+        {
+            throw new NotImplementedException();
+        }
+
 
     }
 }

@@ -94,6 +94,13 @@ app.UseStaticFiles(new StaticFileOptions
     RequestPath = "/category"
 });
 
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(
+        Path.Combine(Directory.GetCurrentDirectory(), "resource/userprofile/images")),
+    RequestPath = "/userprofile"
+});
+
 app.UseHttpsRedirection();
 
 app.UseAuthorization();

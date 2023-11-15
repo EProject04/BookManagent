@@ -1,4 +1,5 @@
 ﻿using Azure.Core;
+using BEWebtoon.DataTransferObject.BooksDto;
 using BEWebtoon.DataTransferObject.FollowingsDto;
 using BEWebtoon.Pagination;
 using BEWebtoon.Repositories.Interfaces;
@@ -14,24 +15,20 @@ namespace BEWebtoon.Services
         {
             _repository = repository;
         }
-        public async Task<List<FollowingDto>> GetAll()
+
+        public async Task<List<BookDto>> GetFollowingBooks(int userprofileId)
         {
-            return await _repository.GetAll();
+            return await _repository.GetFollowingBooks(userprofileId);
         }
 
-        public async Task<FollowingDto> GetById(int id)
+        public async Task Following(int userprofileId, int bookId)
         {
-            return await _repository.GetById(id);
+            await _repository.Following(userprofileId, bookId);
         }
 
-        public async Task<PagedResult<FollowingDto>> GetFollowingPagination(SeacrhPagingRequest request)
+        public async Task UnFollowing(int userprofileId, int bookId)
         {
-            return await _repository.GetFollowingPagination(request);
-        }
-
-        public async Task UpdateFollowing(UpdateFollowingDto updateFollowingDto)
-        {
-            await _repository.UpdateFollowing(updateFollowingDto);
+            await _repository.UnFollowing(userprofileId, bookId);
         }
     }
 }
