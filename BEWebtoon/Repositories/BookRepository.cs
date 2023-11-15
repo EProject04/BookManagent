@@ -115,21 +115,6 @@ namespace BEWebtoon.Repositories
                 {
                     booksDto = _mapper.Map<List<Book>, List<BookDto>>(books);
                 }
-                foreach (var item in booksDto)
-                {
-                    if (item.ImagePath != null)
-                    {
-                        if (File.Exists(Path.Combine(item.ImagePath)))
-                        {
-                            byte[] imageArray = System.IO.File.ReadAllBytes(Path.Combine(item.ImagePath));
-                            item.Image = imageArray;
-                        }
-                        else
-                            item.Image = null;
-                    }
-                    else
-                        item.Image = null;
-                }
                 return booksDto;
             }
             return null;
@@ -159,21 +144,6 @@ namespace BEWebtoon.Repositories
                                                            || SearchHelper.ConvertToUnSign(bf.Categories.CategoryName).TrimAndLower().Contains(request.CategoryName.TrimAndLower()))).ToList();
             }
             var items = _mapper.Map<IEnumerable<BookDto>>(query);
-            foreach (var item in items)
-            {
-                if (item.ImagePath != null)
-                {
-                    if (File.Exists(Path.Combine(item.ImagePath)))
-                    {
-                        byte[] imageArray = System.IO.File.ReadAllBytes(Path.Combine(item.ImagePath));
-                        item.Image = imageArray;
-                    }
-                    else
-                        item.Image = null;
-                }
-                else
-                    item.Image = null;
-            }
             return PagedResult<BookDto>.ToPagedList(items, request.PageIndex, request.PageSize);
         }
 
@@ -191,18 +161,6 @@ namespace BEWebtoon.Repositories
                 {
 
                 BookDto bookDto = _mapper.Map<Book, BookDto>(book);
-                if (book.ImagePath != null)
-                {
-                    if (File.Exists(Path.Combine(book.ImagePath)))
-                    {
-                        byte[] imageArray = System.IO.File.ReadAllBytes(Path.Combine(book.ImagePath));
-                        bookDto.Image = imageArray;
-                    }
-                    else
-                        bookDto.Image = null;
-                }
-                else
-                    bookDto.Image = null;
                 return bookDto;
 
                 }
@@ -219,7 +177,7 @@ namespace BEWebtoon.Repositories
                 var book = await _dBContext.Books.Where(x => x.Id == updateBookDto.Id).Include(a => a.CategoryBooks).Include(w => w.BookFollows).FirstOrDefaultAsync();
                 var data = _mapper.Map<Book>(book);
                 if (book != null)
-                {
+        {
                     data.CategoryBooks = updateBookDto.CategoryId.Select(categoryId => new CategoryBook { CategoryId = categoryId }).ToList();
                     data.BookFollows = updateBookDto.AuthorId.Select(authorId => new BookFollow { AuthorId = authorId }).ToList();
                     data.Title = updateBookDto.Title;
@@ -228,14 +186,14 @@ namespace BEWebtoon.Repositories
                     data.Status = updateBookDto.Status;
 
                     if (updateBookDto.File != null && updateBookDto.File.Length > 0)
-                    {
+            {
                         string oldImageName = ImageHelper.ImageName(book.Title);
                         string oldImagePath = Path.Combine(_env.ContentRootPath, "resource/book/images", oldImageName);
                         File.Delete(oldImagePath);
                         string newImageName = ImageHelper.ImageName(updateBookDto.Title);
                         string newImagePath = Path.Combine(_env.ContentRootPath, "resource/book/images", newImageName);
                         using (var fileStream = new FileStream(newImagePath, FileMode.Create))
-                        {
+                {
                             await updateBookDto.File.CopyToAsync(fileStream);
                         }
                         data.ImagePath = ImageHelper.BookImageUri(newImageName);
@@ -244,5 +202,6 @@ namespace BEWebtoon.Repositories
                 }
             }
         }
+
     }
 }

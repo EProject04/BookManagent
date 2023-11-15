@@ -57,21 +57,6 @@ namespace BEWebtoon.Repositories
                 {
                     usersDto = _mapper.Map<List<UserProfile>, List<UserProfileDto>>(users);
                 }
-                foreach (var item in usersDto)
-                {
-                    if (item.ImagePath != null)
-                    {
-                        if (File.Exists(Path.Combine(item.ImagePath)))
-                        {
-                            byte[] imageArray = System.IO.File.ReadAllBytes(Path.Combine(item.ImagePath));
-                            item.Image = imageArray;
-                        }
-                        else
-                            item.Image = null;
-                    }
-                    else
-                        item.Image = null;
-                }
                 return usersDto;
             }
             return null;
@@ -82,22 +67,8 @@ namespace BEWebtoon.Repositories
             var userProfile = await _dBContext.UserProfiles.FindAsync(id);
             if (userProfile != null)
             {
-
                 UserProfileDto userProfileDto = _mapper.Map<UserProfile, UserProfileDto>(userProfile);
-                if (userProfile.ImagePath != null)
-                {
-                    if (File.Exists(Path.Combine(userProfile.ImagePath)))
-                    {
-                        byte[] imageArray = System.IO.File.ReadAllBytes(Path.Combine(userProfile.ImagePath));
-                        userProfileDto.Image = imageArray;
-                    }
-                    else
-                        userProfileDto.Image = null;
-                }
-                else
-                    userProfileDto.Image = null;
                 return userProfileDto;
-
             }
             else
             {
@@ -127,21 +98,6 @@ namespace BEWebtoon.Repositories
                     }
                 }
                 var items = _mapper.Map<IEnumerable<UserProfileDto>>(query);
-                foreach (var item in items)
-                {
-                    if (item.ImagePath != null)
-                    {
-                        if (File.Exists(Path.Combine(item.ImagePath)))
-                        {
-                            byte[] imageArray = System.IO.File.ReadAllBytes(Path.Combine(item.ImagePath));
-                            item.Image = imageArray;
-                        }
-                        else
-                            item.Image = null;
-                    }
-                    else
-                        item.Image = null;
-                }
                 return PagedResult<UserProfileDto>.ToPagedList(items, request.PageIndex, request.PageSize);
             }
             return null;

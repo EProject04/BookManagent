@@ -32,35 +32,10 @@ namespace BEWebtoon.Repositories
             if (_sessionManager.CheckLogin())
             {
                 List<FollowingDto> followingsDto = new List<FollowingDto>();
-                var followings = await _dBContext.Followings
+                var userId = _sessionManager.GetSessionValueInt("UserId");
+                var followings = await _dBContext.Followings.Where(x => x.UserId == userId)
                                 .Include(x => x.Books).ToListAsync();
-                if (followings != null)
-                {
                     followingsDto = _mapper.Map<List<Following>, List<FollowingDto>>(followings);
-
-                }
-                foreach (var item in followingsDto)
-                {
-                    if (item.Books != null)
-                    {
-                        foreach (var i in item.Books)
-                        {
-                            if (i.ImagePath != null)
-                            {
-                                if (File.Exists(Path.Combine(i.ImagePath)))
-                                {
-                                    byte[] imageArray = System.IO.File.ReadAllBytes(Path.Combine(i.ImagePath));
-                                    i.Image = imageArray;
-                                }
-                                else
-                                    i.Image = null;
-                            }
-                            else
-                                i.Image = null;
-                        }
-                    }
-                }
-
                 return followingsDto;
             }
             else
@@ -78,26 +53,6 @@ namespace BEWebtoon.Repositories
                 if (following != null)
                 {
                     FollowingDto followingDto = _mapper.Map<Following, FollowingDto>(following);
-
-                    if (followingDto.Books != null)
-                    {
-
-                        foreach (var i in followingDto.Books)
-                        {
-                            if (i.ImagePath != null)
-                            {
-                                if (File.Exists(Path.Combine(i.ImagePath)))
-                                {
-                                    byte[] imageArray = System.IO.File.ReadAllBytes(Path.Combine(i.ImagePath));
-                                    i.Image = imageArray;
-                                }
-                                else
-                                    i.Image = null;
-                            }
-                            else
-                                i.Image = null;
-                        }
-                    }
                     return followingDto;
                 }
                 else
@@ -117,14 +72,7 @@ namespace BEWebtoon.Repositories
             if (_sessionManager.CheckLogin())
             {
                 var userId = _sessionManager.GetSessionValueInt("UserId");
-                var following = await _dBContext.Followings
-                            .Include(x => x.Books).FirstOrDefaultAsync(b => b.Id == userId);
-                if(following == null)
-                {
-                    throw new CustomException("Khong tim thay nguoi dung");
-                }
-                var count = 0;
-                var query = await _dBContext.Followings
+                var query = await _dBContext.Followings.Where(x=>x.UserId == userId)
                             .Include(x => x.Books).ToListAsync();
                 var items = _mapper.Map<IEnumerable<FollowingDto>>(query);
                 foreach (var item in items)
@@ -136,22 +84,6 @@ namespace BEWebtoon.Repositories
                                                     || SearchHelper.ConvertToUnSign(x.Title).ToLower().Contains(request.keyword.ToLower())).ToList();
 
                         item.Books = item.Books.Skip((request.PageIndex - 1) * request.PageSize).Take(request.PageSize).ToList();
-                        foreach (var i in item.Books)
-                        {
-
-                            if (i.ImagePath != null)
-                            {
-                                if (File.Exists(Path.Combine(i.ImagePath)))
-                                {
-                                    byte[] imageArray = System.IO.File.ReadAllBytes(Path.Combine(i.ImagePath));
-                                    i.Image = imageArray;
-                                }
-                                else
-                                    i.Image = null;
-                            }
-                            else
-                                i.Image = null;
-                        }
                     }
                 }
                 return PagedResult<FollowingDto>.ToPagedList(items, request.PageIndex, request.PageSize);
