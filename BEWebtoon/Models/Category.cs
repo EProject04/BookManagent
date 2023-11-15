@@ -1,4 +1,5 @@
-﻿using BEWebtoon.Models.Domains.Interfaces;
+﻿
+using BEWebtoon.Models.Domains.Interfaces;
 using BEWebtoon.Models.Domains;
 
 namespace BEWebtoon.Models

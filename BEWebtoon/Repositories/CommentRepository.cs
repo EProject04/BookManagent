@@ -81,8 +81,8 @@ namespace BEWebtoon.Repositories
 
         public async Task<List<CommentDto>> GetAll()
         {
-            //if (_sessionManager.CheckRole(ROLE_CONSTANTS.AdminAuthor))
-            //{
+            if (_sessionManager.CheckRole(ROLE_CONSTANTS.AdminAuthor))
+            {
                 List<CommentDto> commnetsDto = new List<CommentDto>();
                 var comments = await _dBContext.Comments.ToListAsync();
                 if (comments != null)
@@ -90,7 +90,7 @@ namespace BEWebtoon.Repositories
                     commnetsDto = _mapper.Map<List<Comment>, List<CommentDto>>(comments);
                 }
                 return commnetsDto;
-            //}
+            }
             return null;
         }
 

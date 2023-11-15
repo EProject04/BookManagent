@@ -7,7 +7,6 @@ using BEWebtoon.Services;
 using BEWebtoon.Repositories.Interfaces;
 using BEWebtoon.Services.Interfaces;
 using Microsoft.Extensions.FileProviders;
-using Microsoft.AspNetCore.Hosting;
 
 var allowSpecificOrigins = "_allowSpecificOrigins";
 var builder = WebApplication.CreateBuilder(args);
@@ -100,6 +99,8 @@ app.UseStaticFiles(new StaticFileOptions
         Path.Combine(Directory.GetCurrentDirectory(), "resource/userprofile/images")),
     RequestPath = "/userprofile"
 });
+
+app.UseStaticFiles();
 
 app.UseHttpsRedirection();
 

@@ -4,7 +4,8 @@ namespace BEWebtoon.Helpers
 {
     public class ImageHelper
     {
-        public static string ImageName(string bookName) {
+        public static string ImageName(string bookName)
+        {
             string pattern = "[/:*?\"<>|]";
             string imagePath = Regex.Replace(bookName, pattern, string.Empty);
             imagePath = imagePath.Replace("\\", string.Empty);

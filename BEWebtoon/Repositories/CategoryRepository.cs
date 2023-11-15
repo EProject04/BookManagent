@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using BEWebtoon.DataTransferObject.BooksDto;
 using BEWebtoon.DataTransferObject.CategoriesDto;
 using BEWebtoon.DataTransferObject.UserProfilesDto;
 using BEWebtoon.DataTransferObject.UsersDto;
@@ -30,8 +29,8 @@ namespace BEWebtoon.Repositories
         }
         public async Task CreateCategory(CreateCategoryDto createCategoryDto)
         {
-            //if (_sessionManager.CheckRole(ROLE_CONSTANTS.Admin))
-            //{
+            if (_sessionManager.CheckRole(ROLE_CONSTANTS.Admin))
+            {
 
                 var data = _mapper.Map<Category>(createCategoryDto);
                 if (createCategoryDto.File != null && createCategoryDto.File.Length > 0)
@@ -53,13 +52,13 @@ namespace BEWebtoon.Repositories
                 {
                     throw new CustomException($"Da ton tai the loai nay roi" + ex);
                 }
-            //}
+            }
         }
 
         public async Task DeleteCategory(int id)
         {
-            //if (_sessionManager.CheckRole(ROLE_CONSTANTS.Admin))
-            //{
+            if (_sessionManager.CheckRole(ROLE_CONSTANTS.Admin))
+            {
                 var category = await _dBContext.Categories.FindAsync(id);
                 if (category != null)
                 {
@@ -70,13 +69,13 @@ namespace BEWebtoon.Repositories
                 {
                     throw new Exception("Khong tim thay the loai nay");
                 }
-            //}
+            }
         }
 
         public async Task<List<CategoryDto>> GetAll()
         {
-            //if (_sessionManager.CheckRole(ROLE_CONSTANTS.Admin))
-            //{
+            if (_sessionManager.CheckRole(ROLE_CONSTANTS.Admin))
+            {
                 List<CategoryDto> categoriesDto = new List<CategoryDto>();
                 var categories = await _dBContext.Categories.ToListAsync();
                 if (categories != null)
@@ -84,20 +83,48 @@ namespace BEWebtoon.Repositories
                     categoriesDto = _mapper.Map<List<Category>, List<CategoryDto>>(categories);
 
                 }
+                foreach (var item in categoriesDto)
+                {
+                    if (item.ImagePath != null)
+                    {
+                        if (File.Exists(Path.Combine(item.ImagePath)))
+                        {
+                            byte[] imageArray = System.IO.File.ReadAllBytes(Path.Combine(item.ImagePath));
+                            item.Image = imageArray;
+                        }
+                        else
+                            item.Image = null;
+                    }
+                    else
+                        item.Image = null;
+                }
                 return categoriesDto;
-            //}
+            }
             return null;
         }
 
         public async Task<CategoryDto> GetById(int id)
         {
-            //if (_sessionManager.CheckRole(ROLE_CONSTANTS.Admin))
-            //{
+            if (_sessionManager.CheckRole(ROLE_CONSTANTS.Admin))
+            {
                 var category = await _dBContext.Categories.FindAsync(id);
                 if (category != null)
                 {
 
                     CategoryDto categoryDto = _mapper.Map<Category, CategoryDto>(category);
+                    if (category.ImagePath != null)
+                    {
+                        if (File.Exists(Path.Combine(category.ImagePath)))
+                        {
+                            byte[] imageArray = System.IO.File.ReadAllBytes(Path.Combine(category.ImagePath));
+                            categoryDto.Image = imageArray;
+                        }
+                        else
+                            categoryDto.Image = null;
+                    }
+                    else
+                        categoryDto.Image = null;
+
                     return categoryDto;
 
                 }
@@ -105,7 +132,7 @@ namespace BEWebtoon.Repositories
                 {
                     throw new Exception("Khong tim thay the loai nay");
                 }
-            //}
+            }
             return null;
         }
 
@@ -117,14 +144,29 @@ namespace BEWebtoon.Repositories
                 query = query.Where(x => x.CategoryName.ToLower().Contains(request.keyword.ToLower())
                                         || SearchHelper.ConvertToUnSign(x.CategoryName).ToLower().Contains(request.keyword.ToLower())).ToList();
             var items = _mapper.Map<IEnumerable<CategoryDto>>(query);
+            foreach (var item in items)
+            {
+                if (item.ImagePath != null)
+                {
+                    if (File.Exists(Path.Combine(item.ImagePath)))
+                    {
+                        byte[] imageArray = System.IO.File.ReadAllBytes(Path.Combine(item.ImagePath));
+                        item.Image = imageArray;
+                    }
+                    else
+                        item.Image = null;
+                }
+                else
+                    item.Image = null;
+            }
             return PagedResult<CategoryDto>.ToPagedList(items, request.PageIndex, request.PageSize);
             
         }
 
         public async Task UpdateCategory(UpdateCategoryDto updateCategoryDto)
         {
-            //if (_sessionManager.CheckRole(ROLE_CONSTANTS.Admin))
-            //{
+            if (_sessionManager.CheckRole(ROLE_CONSTANTS.Admin))
+            {
                 var category = await _dBContext.Categories.Where(x => x.Id == updateCategoryDto.Id).FirstOrDefaultAsync();
                 var data = _mapper.Map<Category>(category);
                 if (updateCategoryDto.File != null && updateCategoryDto.File.Length > 0)
@@ -143,7 +185,7 @@ namespace BEWebtoon.Repositories
                     data.ImagePath = ImageHelper.CategoryImageUri(newImageName);
                 }
                 await _dBContext.SaveChangesAsync();
-            //}
+            }
         }
     }
 }

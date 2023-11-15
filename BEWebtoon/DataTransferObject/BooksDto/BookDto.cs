@@ -11,6 +11,7 @@ namespace BEWebtoon.DataTransferObject.BooksDto
         public string? Description { get; set; }
         public string? Content { get; set; }
         public string? ImagePath { get; set; }
+        public byte[]? Image { get; set; }
         public bool? Status { get; set; }
         public List<BookFollowDto>? BookFollows { get; set; }
         public List<CategoryBookDto>? CategoriesBook { get; set; }

@@ -32,8 +32,8 @@ namespace BEWebtoon.Repositories
         }
         public async Task CreateUser(CreateUserDto userDto)
         {
-            //if (_sessionManager.CheckRole(ROLE_CONSTANTS.Admin))
-            //{
+            if (_sessionManager.CheckRole(ROLE_CONSTANTS.Admin))
+            {
                 var userInfo = await _dBContext.Users.Where(x => x.Username == userDto.Username).FirstOrDefaultAsync();
                 if (userInfo != null)
                 {
@@ -65,6 +65,11 @@ namespace BEWebtoon.Repositories
                                 };
                                 userProfile.Authors = author;
                             }
+                            var following = new Following
+                            {
+                                UserId = userProfile.Id,
+                            };
+                            userProfile.Followings = following;
 
                             await _dBContext.UserProfiles.AddAsync(userProfile);
                             await _dBContext.SaveChangesAsync();
@@ -80,13 +85,17 @@ namespace BEWebtoon.Repositories
                         throw new CustomException("Không tìm thấy quyền người dùng");
                     }
                 }
-            //}
+
+
+                
+               
+            }
         }
 
         public async Task DeleteUser(int id)
         {
-            //if (_sessionManager.CheckRole(ROLE_CONSTANTS.Admin))
-            //{
+            if (_sessionManager.CheckRole(ROLE_CONSTANTS.Admin))
+            {
                 var user = await _dBContext.Users.FindAsync(id);
                 if (user != null)
                 {
@@ -97,13 +106,13 @@ namespace BEWebtoon.Repositories
                 {
                     throw new Exception("Khong tim thay nguoi dung");
                 }
-            //}
+            }
         }
 
         public async Task<List<UserDto>> GetAll()
         {
-            //if (_sessionManager.CheckRole(ROLE_CONSTANTS.Admin))
-            //{
+            if (_sessionManager.CheckRole(ROLE_CONSTANTS.Admin))
+            {
                 List<UserDto> usersDto = new List<UserDto>();
                 var users = await _dBContext.Users.Include(u => u.Roles).ToListAsync();
                 if (users != null)
@@ -111,14 +120,14 @@ namespace BEWebtoon.Repositories
                     usersDto = _mapper.Map<List<User>, List<UserDto>>(users);
                 }
                 return usersDto;
-            //}
+            }
             return null;
         }
 
         public async Task<UserDto> GetById(int id)
         {
-            //if (_sessionManager.CheckRole(ROLE_CONSTANTS.Admin))
-            //{
+            if (_sessionManager.CheckRole(ROLE_CONSTANTS.Admin))
+            {
                 var user = await _dBContext.Users.FindAsync(id);
                 if (user != null)
                 {
@@ -131,14 +140,14 @@ namespace BEWebtoon.Repositories
                 {
                     throw new Exception("Khong tim thay nguoi dung");
                 }
-            //}
+            }
             return null;
         }
 
         public async Task UpdateUser(UpdateUserDto userDto)
         {
-            //if (_sessionManager.CheckRole(ROLE_CONSTANTS.Admin))
-            //{ 
+            if (_sessionManager.CheckRole(ROLE_CONSTANTS.Admin))
+            { 
                 await _dBContext.Database.BeginTransactionAsync();
                 var user = await _dBContext.Users.Where(x => x.Id == userDto.Id).FirstOrDefaultAsync();
                 if (user != null)
@@ -151,21 +160,21 @@ namespace BEWebtoon.Repositories
                 {
                     throw new Exception("Khong tim thay nguoi dung");
                 }
-            //}
+            }
         }
        
 
         public async Task<PagedResult<UserDto>> GetUserPagination(SeacrhPagingRequest request)
         {
-            //if (_sessionManager.CheckRole(ROLE_CONSTANTS.Admin))
-            //{
+            if (_sessionManager.CheckRole(ROLE_CONSTANTS.Admin))
+            {
                 var query = await _dBContext.Users.ToListAsync();
                 if (!string.IsNullOrEmpty(request.keyword))
                     query = query.Where(x => x.Username.ToLower().Contains(request.keyword.ToLower())
                                             || SearchHelper.ConvertToUnSign(x.Username).ToLower().Contains(request.keyword.ToLower())).ToList();
                 var items = _mapper.Map<IEnumerable<UserDto>>(query);
                 return PagedResult<UserDto>.ToPagedList(items, request.PageIndex, request.PageSize);
-            //}
+            }
             return null;
            
         }
@@ -199,15 +208,21 @@ namespace BEWebtoon.Repositories
                         };
                         userProfile.Authors = author;
                     }
- 
+                    var following = new Following
+                    {
+                        UserId = userProfile.Id,
+                    };
+                    userProfile.Followings = following;
                     await _dBContext.UserProfiles.AddAsync(userProfile);
                     await _dBContext.SaveChangesAsync();
                 }
                 catch (Exception ex)
                 {
                     throw new CustomException($"Loi roi" + ex);
+
                 }
             }
+           
         }
 
         public async Task LoginUser(LoginUserDto userDto)
@@ -220,11 +235,13 @@ namespace BEWebtoon.Repositories
                     _sessionManager.SetSessionValue("RoleId", userInfo.RoleId.ToString());
                     _sessionManager.SetSessionValueInt("UserId", userInfo.Id);
                 }
+                
             }
             else
             {
                 throw new CustomException("Thong tin dang nhap khong dung");
             }
+
         }
 
         public async Task Logout()
