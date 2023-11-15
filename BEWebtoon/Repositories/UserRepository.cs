@@ -56,7 +56,7 @@ namespace BEWebtoon.Repositories
                                 Email = data.Email,
 
                             };
-                           
+
                             if (userDto.RoleId == 2)
                             {
                                 var author = new Author
@@ -73,7 +73,7 @@ namespace BEWebtoon.Repositories
 
                             await _dBContext.UserProfiles.AddAsync(userProfile);
                             await _dBContext.SaveChangesAsync();
-                          
+
                         }
                         catch (Exception ex)
                         {
@@ -176,19 +176,19 @@ namespace BEWebtoon.Repositories
                 return PagedResult<UserDto>.ToPagedList(items, request.PageIndex, request.PageSize);
             }
             return null;
-           
+
         }
 
         public async Task RegisterUser(RegisterUserDto userDto)
         {
-            var userInfo = await _dBContext.Users.Where(x=>x.Username== userDto.Username).FirstOrDefaultAsync();
+            var userInfo = await _dBContext.Users.Where(x => x.Username == userDto.Username).FirstOrDefaultAsync();
             if (userInfo != null)
             {
-                  throw new CustomException("Nguoi dung da ton tai");
+                throw new CustomException("Nguoi dung da ton tai");
             }
             else
             {
-                
+
                 var data = _mapper.Map<User>(userDto);
                 try
                 {
@@ -227,8 +227,8 @@ namespace BEWebtoon.Repositories
 
         public async Task LoginUser(LoginUserDto userDto)
         {
-            var userInfo = await _dBContext.Users.Where(x=>x.Username == userDto.Username && x.Password == userDto.Password).FirstOrDefaultAsync();
-            if(userInfo != null)
+            var userInfo = await _dBContext.Users.Where(x => x.Username == userDto.Username && x.Password == userDto.Password).FirstOrDefaultAsync();
+            if (userInfo != null)
             {
                 if (userInfo != null)
                 {
@@ -256,7 +256,7 @@ namespace BEWebtoon.Repositories
             {
                 throw new CustomException("Không tìm thấy người dùng với email:" + forgotPasswordDto.Email);
             }
-            userInfo.Password =forgotPasswordDto.NewPassword;
+            userInfo.Password = forgotPasswordDto.NewPassword;
             await _dBContext.SaveChangesAsync();
 
             /*            var token = await GeneratePasswordResetTokenAsync(userInfo);
@@ -266,34 +266,34 @@ namespace BEWebtoon.Repositories
                         await SendResetPasswordEmail(forgotPasswordDto.Email, resetLink);*/
         }
 
-       /* private async Task SendResetPasswordEmail(string email, string resetLink)
-        {
-            var apiKey = _configuration.GetSection("SendGrid:ApiKey").Value;
-            var fromEmail = new MailAddress(_configuration.GetSection("SendGrid:FromEmail").Value);
-            var toEmail = new MailAddress(email);
-            var subject = "Reset Password Request";
-            var body = $"Please reset your password by clicking here: {resetLink}";
+        /* private async Task SendResetPasswordEmail(string email, string resetLink)
+         {
+             var apiKey = _configuration.GetSection("SendGrid:ApiKey").Value;
+             var fromEmail = new MailAddress(_configuration.GetSection("SendGrid:FromEmail").Value);
+             var toEmail = new MailAddress(email);
+             var subject = "Reset Password Request";
+             var body = $"Please reset your password by clicking here: {resetLink}";
 
-            using (var mail = new MailMessage(fromEmail, toEmail))
-            {
-                mail.Subject = subject;
-                mail.Body = body;
-                mail.IsBodyHtml = true;
+             using (var mail = new MailMessage(fromEmail, toEmail))
+             {
+                 mail.Subject = subject;
+                 mail.Body = body;
+                 mail.IsBodyHtml = true;
 
-                using (var client = new SmtpClient("smtp.sendgrid.net", 587))
-                {
-                    client.UseDefaultCredentials = false;
-                    client.Credentials = new System.Net.NetworkCredential("apikey", apiKey);
-                    client.EnableSsl = true;
+                 using (var client = new SmtpClient("smtp.sendgrid.net", 587))
+                 {
+                     client.UseDefaultCredentials = false;
+                     client.Credentials = new System.Net.NetworkCredential("apikey", apiKey);
+                     client.EnableSsl = true;
 
-                    await client.SendMailAsync(mail);
-                }
-            }
-        }
-        public async Task<string> GeneratePasswordResetTokenAsync(User user)
-        {
-            var token = Guid.NewGuid().ToString(); 
-            return token;
-        }*/
+                     await client.SendMailAsync(mail);
+                 }
+             }
+         }
+         public async Task<string> GeneratePasswordResetTokenAsync(User user)
+         {
+             var token = Guid.NewGuid().ToString(); 
+             return token;
+         }*/
     }
 }

@@ -34,7 +34,7 @@ namespace BEWebtoon.Repositories
                 }
                 else
                 {
-                    throw new Exception("Khong tim thay nguoi dung");
+                    throw new Exception("Khong tim thay tac gia");
                 }
             }
         }
@@ -56,12 +56,12 @@ namespace BEWebtoon.Repositories
 
         public async Task<PagedResult<AuthorDto>> GetAuthorPagination(SeacrhPagingRequest request)
         {
-                var query = await _dBContext.Authors.ToListAsync();
-                if (!string.IsNullOrEmpty(request.keyword))
-                    query = query.Where(x => x.AuthorName.ToLower().Contains(request.keyword.ToLower())
-                                            || SearchHelper.ConvertToUnSign(x.AuthorName).ToLower().Contains(request.keyword.ToLower())).ToList();
-                var items = _mapper.Map<IEnumerable<AuthorDto>>(query);
-                return PagedResult<AuthorDto>.ToPagedList(items, request.PageIndex, request.PageSize);
+            var query = await _dBContext.Authors.ToListAsync();
+            if (!string.IsNullOrEmpty(request.keyword))
+                query = query.Where(x => x.AuthorName.ToLower().Contains(request.keyword.ToLower())
+                                        || SearchHelper.ConvertToUnSign(x.AuthorName).ToLower().Contains(request.keyword.ToLower())).ToList();
+            var items = _mapper.Map<IEnumerable<AuthorDto>>(query);
+            return PagedResult<AuthorDto>.ToPagedList(items, request.PageIndex, request.PageSize);
         }
 
         public async Task<AuthorDto> GetById(int id)
@@ -78,7 +78,7 @@ namespace BEWebtoon.Repositories
                 }
                 else
                 {
-                    throw new Exception("Khong tim thay nguoi dung");
+                    throw new Exception("Khong tim thay tac gia");
                 }
             }
             return null;
@@ -96,7 +96,7 @@ namespace BEWebtoon.Repositories
                 }
                 else
                 {
-                    throw new Exception("Khong tim thay nguoi dung");
+                    throw new Exception("Khong tim thay tac gia");
                 }
             }
         }

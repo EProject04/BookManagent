@@ -138,7 +138,7 @@ namespace BEWebtoon.Repositories
 
         public async Task<PagedResult<CategoryDto>> GetCategoryPagination(SeacrhPagingRequest request)
         {
-            
+
             var query = await _dBContext.Categories.ToListAsync();
             if (!string.IsNullOrEmpty(request.keyword))
                 query = query.Where(x => x.CategoryName.ToLower().Contains(request.keyword.ToLower())
@@ -160,7 +160,7 @@ namespace BEWebtoon.Repositories
                     item.Image = null;
             }
             return PagedResult<CategoryDto>.ToPagedList(items, request.PageIndex, request.PageSize);
-            
+
         }
 
         public async Task UpdateCategory(UpdateCategoryDto updateCategoryDto)
