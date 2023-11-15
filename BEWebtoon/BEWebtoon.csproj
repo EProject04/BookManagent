@@ -26,6 +26,7 @@
   <ItemGroup>
     <Folder Include="resource\book\images\" />
     <Folder Include="resource\category\images\" />
+    <Folder Include="resource\userprofile\images\" />
   </ItemGroup>
 
 </Project>
