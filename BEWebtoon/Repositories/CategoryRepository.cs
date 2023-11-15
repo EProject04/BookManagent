@@ -138,7 +138,7 @@ namespace BEWebtoon.Repositories
 
         public async Task<PagedResult<CategoryDto>> GetCategoryPagination(SeacrhPagingRequest request)
         {
-
+            
             var query = await _dBContext.Categories.ToListAsync();
             if (!string.IsNullOrEmpty(request.keyword))
                 query = query.Where(x => x.CategoryName.ToLower().Contains(request.keyword.ToLower())
@@ -160,7 +160,7 @@ namespace BEWebtoon.Repositories
                     item.Image = null;
             }
             return PagedResult<CategoryDto>.ToPagedList(items, request.PageIndex, request.PageSize);
-
+            
         }
 
         public async Task UpdateCategory(UpdateCategoryDto updateCategoryDto)
@@ -169,23 +169,23 @@ namespace BEWebtoon.Repositories
             {
                 var category = await _dBContext.Categories.Where(x => x.Id == updateCategoryDto.Id).FirstOrDefaultAsync();
                 var data = _mapper.Map<Category>(category);
-                if (updateCategoryDto.File != null && updateCategoryDto.File.Length > 0)
-                {
+            if (updateCategoryDto.File != null && updateCategoryDto.File.Length > 0)
+            {
                     string oldImageName = ImageHelper.ImageName(category.CategoryName);
                     string oldImagePath = Path.Combine(_env.ContentRootPath, "resource/category/images", oldImageName);
                     File.Delete(oldImagePath);
                     string newImageName = ImageHelper.ImageName(updateCategoryDto.CategoryName);
                     string newImagePath = Path.Combine(_env.ContentRootPath, "resource/category/images", newImageName);
                     using (var fileStream = new FileStream(newImagePath, FileMode.Create))
-                    {
+                {
                         await updateCategoryDto.File.CopyToAsync(fileStream);
-                    }
+                }
                     data.CategoryName = updateCategoryDto.CategoryName;
                     data.Description = updateCategoryDto.Description;
                     data.ImagePath = ImageHelper.CategoryImageUri(newImageName);
-                }
-                await _dBContext.SaveChangesAsync();
             }
+            await _dBContext.SaveChangesAsync();
         }
     }
+}
 }

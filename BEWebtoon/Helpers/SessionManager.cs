@@ -45,6 +45,7 @@
                 throw new CustomException("Ban chua duoc phan quyen");
             }*/
             return true;
+            
         }
         public bool CheckLogin()
         {

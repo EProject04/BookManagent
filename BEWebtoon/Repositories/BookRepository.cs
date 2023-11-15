@@ -149,23 +149,25 @@ namespace BEWebtoon.Repositories
 
         public async Task<BookDto> GetById(int id)
         {
-            var book = await _dBContext.Books
-                     .Include(b => b.BookFollows)
-                         .ThenInclude(bf => bf.Authors)
-                     .Include(b => b.CategoryBooks)
-                         .ThenInclude(cb => cb.Categories)
-                     .Include(x => x.Comments)
-                         .ThenInclude(x => x.UserProfiles)
-                     .FirstOrDefaultAsync(b => b.Id == id);
-            if (book != null)
-            {
+                var book = await _dBContext.Books
+                         .Include(b => b.BookFollows)
+                             .ThenInclude(bf => bf.Authors)
+                         .Include(b => b.CategoryBooks)
+                             .ThenInclude(cb => cb.Categories)
+                         .Include(x => x.Comments)
+                             .ThenInclude(x => x.UserProfiles)
+                         .FirstOrDefaultAsync(b => b.Id == id);
+                if (book != null)
+                {
+
                 BookDto bookDto = _mapper.Map<Book, BookDto>(book);
                 return bookDto;
-            }
-            else
-            {
-                throw new Exception("Khong tim thay sach");
-            }
+
+                }
+                else
+                {
+                    throw new Exception("Khong tim thay sach");
+                }
         }
 
         public async Task UpdateBook(UpdateBookDto updateBookDto)
@@ -175,7 +177,7 @@ namespace BEWebtoon.Repositories
                 var book = await _dBContext.Books.Where(x => x.Id == updateBookDto.Id).Include(a => a.CategoryBooks).Include(w => w.BookFollows).FirstOrDefaultAsync();
                 var data = _mapper.Map<Book>(book);
                 if (book != null)
-                {
+        {
                     data.CategoryBooks = updateBookDto.CategoryId.Select(categoryId => new CategoryBook { CategoryId = categoryId }).ToList();
                     data.BookFollows = updateBookDto.AuthorId.Select(authorId => new BookFollow { AuthorId = authorId }).ToList();
                     data.Title = updateBookDto.Title;
@@ -184,14 +186,14 @@ namespace BEWebtoon.Repositories
                     data.Status = updateBookDto.Status;
 
                     if (updateBookDto.File != null && updateBookDto.File.Length > 0)
-                    {
+            {
                         string oldImageName = ImageHelper.ImageName(book.Title);
                         string oldImagePath = Path.Combine(_env.ContentRootPath, "resource/book/images", oldImageName);
                         File.Delete(oldImagePath);
                         string newImageName = ImageHelper.ImageName(updateBookDto.Title);
                         string newImagePath = Path.Combine(_env.ContentRootPath, "resource/book/images", newImageName);
                         using (var fileStream = new FileStream(newImagePath, FileMode.Create))
-                        {
+                {
                             await updateBookDto.File.CopyToAsync(fileStream);
                         }
                         data.ImagePath = ImageHelper.BookImageUri(newImageName);
@@ -200,5 +202,6 @@ namespace BEWebtoon.Repositories
                 }
             }
         }
+
     }
 }

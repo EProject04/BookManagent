@@ -36,7 +36,7 @@ namespace BEWebtoon.Repositories
                 var followings = await _dBContext.Followings.Where(x => x.UserId == userId)
                                 .Include(x => x.Books).ToListAsync();
                     followingsDto = _mapper.Map<List<Following>, List<FollowingDto>>(followings);
-                    return followingsDto;
+                return followingsDto;
             }
             else
             {
