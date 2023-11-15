@@ -21,11 +21,13 @@ namespace BEWebtoon.Repositories
         private readonly WebtoonDbContext _dBContext;
         private readonly IMapper _mapper;
         private readonly SessionManager _sessionManager;
-        public UserProfileRepository(WebtoonDbContext dbContext, IMapper mapper, SessionManager sessionManager)
+        private readonly IWebHostEnvironment _env;
+        public UserProfileRepository(WebtoonDbContext dbContext, IMapper mapper, SessionManager sessionManager, IWebHostEnvironment env)
         {
             _dBContext = dbContext;
             _mapper = mapper;
             _sessionManager = sessionManager;
+            _env = env;
         }
 
         public async Task DeleteUserProfile(int id)
@@ -153,13 +155,20 @@ namespace BEWebtoon.Repositories
 
             if (updateUserProfileDto.File != null && updateUserProfileDto.File.Length > 0)
             {
-               
-                if (updateUserProfileDto.ImagePath != null)
+                string oldImageName = ImageHelper.UserAvatarName(updateUserProfileDto.Id);
+                string oldImagePath = Path.Combine(_env.ContentRootPath, "resource/userprofile/images", oldImageName);
+                File.Delete(oldImagePath);
+                string newImageName = ImageHelper.UserAvatarName(updateUserProfileDto.Id);
+                string newImagePath = Path.Combine(_env.ContentRootPath, "resource/userprofile/images", newImageName);
+                using (var fileStream = new FileStream(newImagePath, FileMode.Create))
                 {
-                    if (File.Exists(Path.Combine(updateUserProfileDto.ImagePath)))
-                        File.Delete(Path.Combine(updateUserProfileDto.ImagePath));
+                    await updateUserProfileDto.File.CopyToAsync(fileStream);
                 }
-                userProfile.ImagePath = await FileHelper.SaveFile(updateUserProfileDto.File, "UserProfileImage");
+                userProfile.ImagePath = ImageHelper.UserprofileImageUri(newImageName);
+            }
+            else
+            {
+                userProfile.ImagePath = "https://aptechlearningproject.site/uploads/userprofiles/male_default.jpg";
             }
             try
             {

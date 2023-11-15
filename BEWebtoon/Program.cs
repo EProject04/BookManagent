@@ -83,21 +83,21 @@ app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new PhysicalFileProvider(
         Path.Combine(Directory.GetCurrentDirectory(), "resource/book/images")),
-    RequestPath = "/book"
+    RequestPath = "uploads/books"
 });
 
 app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new PhysicalFileProvider(
         Path.Combine(Directory.GetCurrentDirectory(), "resource/category/images")),
-    RequestPath = "/category"
+    RequestPath = "uploads/categories"
 });
 
 app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new PhysicalFileProvider(
         Path.Combine(Directory.GetCurrentDirectory(), "resource/userprofile/images")),
-    RequestPath = "/userprofile"
+    RequestPath = "uploads/userprofiles"
 });
 
 app.UseStaticFiles();
