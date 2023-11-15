@@ -34,7 +34,7 @@ namespace BEWebtoon.Repositories
                 }
                 else
                 {
-                    throw new Exception("Khong tim thay nguoi dung");
+                    throw new Exception("Khong tim thay tac gia");
                 }
             }
         }
@@ -78,7 +78,7 @@ namespace BEWebtoon.Repositories
                 }
                 else
                 {
-                    throw new Exception("Khong tim thay nguoi dung");
+                    throw new Exception("Khong tim thay tac gia");
                 }
             }
             return null;
@@ -96,7 +96,7 @@ namespace BEWebtoon.Repositories
                 }
                 else
                 {
-                    throw new Exception("Khong tim thay nguoi dung");
+                    throw new Exception("Khong tim thay tac gia");
                 }
             }
         }

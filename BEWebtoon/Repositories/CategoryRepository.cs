@@ -19,11 +19,13 @@ namespace BEWebtoon.Repositories
         private readonly WebtoonDbContext _dBContext;
         private readonly IMapper _mapper;
         private readonly SessionManager _sessionManager;
-        public CategoryRepository(WebtoonDbContext dbContext, IMapper mapper, SessionManager sessionManager)
+        private readonly IWebHostEnvironment _env;
+        public CategoryRepository(WebtoonDbContext dbContext, IMapper mapper, SessionManager sessionManager, IWebHostEnvironment env)
         {
             _dBContext = dbContext;
             _mapper = mapper;
             _sessionManager = sessionManager;
+            _env = env;
         }
         public async Task CreateCategory(CreateCategoryDto createCategoryDto)
         {
@@ -33,13 +35,13 @@ namespace BEWebtoon.Repositories
                 var data = _mapper.Map<Category>(createCategoryDto);
                 if (createCategoryDto.File != null && createCategoryDto.File.Length > 0)
                 {
-
-                    if (createCategoryDto.ImagePath != null)
+                    string fileName = ImageHelper.ImageName(createCategoryDto.CategoryName);
+                    string filePath = Path.Combine(_env.ContentRootPath, "resource/category/images", fileName);
+                    using (var fileStream = new FileStream(filePath, FileMode.Create))
                     {
-                        if (File.Exists(Path.Combine(createCategoryDto.ImagePath)))
-                            File.Delete(Path.Combine(createCategoryDto.ImagePath));
+                        await createCategoryDto.File.CopyToAsync(fileStream);
                     }
-                    data.ImagePath = await FileHelper.SaveFile(createCategoryDto.File, "CategoryImage");
+                    data.ImagePath = ImageHelper.CategoryImageUri(fileName);
                 }
                 try
                 {
@@ -163,19 +165,27 @@ namespace BEWebtoon.Repositories
 
         public async Task UpdateCategory(UpdateCategoryDto updateCategoryDto)
         {
-            var userProfile = await _dBContext.Categories.Where(x => x.Id == updateCategoryDto.Id).FirstOrDefaultAsync();
-            var data = _mapper.Map<UserProfile>(userProfile);
+            if (_sessionManager.CheckRole(ROLE_CONSTANTS.Admin))
+            {
+                var category = await _dBContext.Categories.Where(x => x.Id == updateCategoryDto.Id).FirstOrDefaultAsync();
+                var data = _mapper.Map<Category>(category);
             if (updateCategoryDto.File != null && updateCategoryDto.File.Length > 0)
             {
-
-                if (updateCategoryDto.ImagePath != null)
+                    string oldImageName = ImageHelper.ImageName(category.CategoryName);
+                    string oldImagePath = Path.Combine(_env.ContentRootPath, "resource/category/images", oldImageName);
+                    File.Delete(oldImagePath);
+                    string newImageName = ImageHelper.ImageName(updateCategoryDto.CategoryName);
+                    string newImagePath = Path.Combine(_env.ContentRootPath, "resource/category/images", newImageName);
+                    using (var fileStream = new FileStream(newImagePath, FileMode.Create))
                 {
-                    if (File.Exists(Path.Combine(updateCategoryDto.ImagePath)))
-                        File.Delete(Path.Combine(updateCategoryDto.ImagePath));
+                        await updateCategoryDto.File.CopyToAsync(fileStream);
                 }
-                data.ImagePath = await FileHelper.SaveFile(updateCategoryDto.File, "CategoryImage");
+                    data.CategoryName = updateCategoryDto.CategoryName;
+                    data.Description = updateCategoryDto.Description;
+                    data.ImagePath = ImageHelper.CategoryImageUri(newImageName);
             }
             await _dBContext.SaveChangesAsync();
         }
     }
+}
 }

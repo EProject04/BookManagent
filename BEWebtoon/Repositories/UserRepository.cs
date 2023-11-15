@@ -181,7 +181,7 @@ namespace BEWebtoon.Repositories
 
         public async Task RegisterUser(RegisterUserDto userDto)
         {
-            var userInfo = await _dBContext.Users.Where(x=>x.Username== userDto.Username).FirstOrDefaultAsync();
+            var userInfo = await _dBContext.Users.Where(x => x.Username == userDto.Username).FirstOrDefaultAsync();
             if (userInfo != null)
             {
                   throw new CustomException("Nguoi dung da ton tai");
@@ -227,8 +227,8 @@ namespace BEWebtoon.Repositories
 
         public async Task LoginUser(LoginUserDto userDto)
         {
-            var userInfo = await _dBContext.Users.Where(x=>x.Username == userDto.Username && x.Password == userDto.Password).FirstOrDefaultAsync();
-            if(userInfo != null)
+            var userInfo = await _dBContext.Users.Where(x => x.Username == userDto.Username && x.Password == userDto.Password).FirstOrDefaultAsync();
+            if (userInfo != null)
             {
                 if (userInfo != null)
                 {
@@ -256,7 +256,7 @@ namespace BEWebtoon.Repositories
             {
                 throw new CustomException("Không tìm thấy người dùng với email:" + forgotPasswordDto.Email);
             }
-            userInfo.Password =forgotPasswordDto.NewPassword;
+            userInfo.Password = forgotPasswordDto.NewPassword;
             await _dBContext.SaveChangesAsync();
 
             /*            var token = await GeneratePasswordResetTokenAsync(userInfo);
