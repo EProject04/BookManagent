@@ -32,7 +32,8 @@ namespace BEWebtoon.Repositories
             if (_sessionManager.CheckLogin())
             {
                 List<FollowingDto> followingsDto = new List<FollowingDto>();
-                var followings = await _dBContext.Followings
+                var userId = _sessionManager.GetSessionValueInt("UserId");
+                var followings = await _dBContext.Followings.Where(x => x.UserId == userId)
                                 .Include(x => x.Books).ToListAsync();
                 if (followings != null)
                 {
@@ -117,14 +118,8 @@ namespace BEWebtoon.Repositories
             if (_sessionManager.CheckLogin())
             {
                 var userId = _sessionManager.GetSessionValueInt("UserId");
-                var following = await _dBContext.Followings
-                            .Include(x => x.Books).FirstOrDefaultAsync(b => b.Id == userId);
-                if(following == null)
-                {
-                    throw new CustomException("Khong tim thay nguoi dung");
-                }
-                var count = 0;
-                var query = await _dBContext.Followings
+                
+                var query = await _dBContext.Followings.Where(x=>x.UserId == userId)
                             .Include(x => x.Books).ToListAsync();
                 var items = _mapper.Map<IEnumerable<FollowingDto>>(query);
                 foreach (var item in items)
