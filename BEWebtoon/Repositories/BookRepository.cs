@@ -8,6 +8,7 @@ using BEWebtoon.Requests.BookRequest;
 using BEWebtoon.WebtoonDBContext;
 using IOC.ApplicationLayer.Utilities;
 using IOCBEWebtoon.Utilities;
+using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.EntityFrameworkCore;
 
 namespace BEWebtoon.Repositories
@@ -17,11 +18,13 @@ namespace BEWebtoon.Repositories
         private readonly WebtoonDbContext _dBContext;
         private readonly IMapper _mapper;
         private readonly SessionManager _sessionManager;
-        public BookRepository(WebtoonDbContext dbContext, IMapper mapper, SessionManager sessionManager)
+        private readonly IWebHostEnvironment _env;
+        public BookRepository(WebtoonDbContext dbContext, IMapper mapper, SessionManager sessionManager, IWebHostEnvironment env)
         {
             _dBContext = dbContext;
             _mapper = mapper;
             _sessionManager = sessionManager;
+            _env = env;
         }
         public async Task CreateBook(CreateBookDto createBookDto)
         {
@@ -54,7 +57,18 @@ namespace BEWebtoon.Repositories
                     }
                 }
 
-                await ProcessBookData(data, createBookDto);
+                data.CategoryBooks = createBookDto.CategoryId.Select(categoryId => new CategoryBook { CategoryId = categoryId }).ToList();
+                data.BookFollows = createBookDto.AuthorId.Select(authorId => new BookFollow { AuthorId = authorId }).ToList();
+                if (createBookDto.File != null && createBookDto.File.Length > 0)
+                {
+                    string fileName = ImageHelper.ImageName(createBookDto.Title);
+                    string filePath = Path.Combine(_env.ContentRootPath, "resource/book/images", fileName);
+                    using (var fileStream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await createBookDto.File.CopyToAsync(fileStream);
+                    }
+                    data.ImagePath = ImageHelper.BookImageUri(fileName);
+                }
 
                 try
                 {
@@ -202,10 +216,30 @@ namespace BEWebtoon.Repositories
         {
             if (_sessionManager.CheckRole(ROLE_CONSTANTS.AdminAuthor))
             {
-                var book = await _dBContext.Books.Where(x => x.Id == updateBookDto.Id).Include(a=>a.CategoryBooks).Include(w=>w.BookFollows).FirstOrDefaultAsync();
-                if(book!= null)
+                var book = await _dBContext.Books.Where(x => x.Id == updateBookDto.Id).Include(a => a.CategoryBooks).Include(w => w.BookFollows).FirstOrDefaultAsync();
+                var data = _mapper.Map<Book>(book);
+                if (book != null)
                 {
-                    await ProcessBookData(book, updateBookDto);
+                    data.CategoryBooks = updateBookDto.CategoryId.Select(categoryId => new CategoryBook { CategoryId = categoryId }).ToList();
+                    data.BookFollows = updateBookDto.AuthorId.Select(authorId => new BookFollow { AuthorId = authorId }).ToList();
+                    data.Title = updateBookDto.Title;
+                    data.Description = updateBookDto.Description;
+                    data.Content = updateBookDto.Content;
+                    data.Status = updateBookDto.Status;
+
+                    if (updateBookDto.File != null && updateBookDto.File.Length > 0)
+                    {
+                        string oldImageName = ImageHelper.ImageName(book.Title);
+                        string oldImagePath = Path.Combine(_env.ContentRootPath, "resource/book/images", oldImageName);
+                        File.Delete(oldImagePath);
+                        string newImageName = ImageHelper.ImageName(updateBookDto.Title);
+                        string newImagePath = Path.Combine(_env.ContentRootPath, "resource/book/images", newImageName);
+                        using (var fileStream = new FileStream(newImagePath, FileMode.Create))
+                        {
+                            await updateBookDto.File.CopyToAsync(fileStream);
+                        }
+                        data.ImagePath = ImageHelper.BookImageUri(newImageName);
+                    }
                     await _dBContext.SaveChangesAsync();
                 }
             }

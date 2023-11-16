@@ -70,6 +70,7 @@ namespace BEWebtoon.Repositories
                                 UserId = userProfile.Id,
                             };
                             userProfile.Followings = following;
+                            userProfile.ImagePath = "https://aptechlearningproject.site/uploads/userprofiles/male_default.jpg";
 
                             await _dBContext.UserProfiles.AddAsync(userProfile);
                             await _dBContext.SaveChangesAsync();

@@ -6,6 +6,8 @@ using BEWebtoon.Repositories;
 using BEWebtoon.Services;
 using BEWebtoon.Repositories.Interfaces;
 using BEWebtoon.Services.Interfaces;
+using Microsoft.Extensions.FileProviders;
+
 var allowSpecificOrigins = "_allowSpecificOrigins";
 var builder = WebApplication.CreateBuilder(args);
 
@@ -76,6 +78,27 @@ app.UseSwagger();
 app.UseSwaggerUI();
 
 app.UseSession();
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(
+        Path.Combine(Directory.GetCurrentDirectory(), "resource/book/images")),
+    RequestPath = "/uploads/books"
+});
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(
+        Path.Combine(Directory.GetCurrentDirectory(), "resource/category/images")),
+    RequestPath = "/uploads/categories"
+});
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(
+        Path.Combine(Directory.GetCurrentDirectory(), "resource/userprofile/images")),
+    RequestPath = "/uploads/userprofiles"
+});
 
 app.UseStaticFiles();
 
