@@ -24,9 +24,25 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="resource\book\images\" />
-    <Folder Include="resource\category\images\" />
-    <Folder Include="resource\userprofile\images\" />
+    <None Include="wwwroot\resource\book\images\1.jpg" />
+    <None Include="wwwroot\resource\book\images\12.jpg" />
+    <None Include="wwwroot\resource\book\images\moon.jpg" />
+    <None Include="wwwroot\resource\category\images\Action.jpg" />
+    <None Include="wwwroot\resource\category\images\Kinh-dị.jpg" />
+    <None Include="wwwroot\resource\category\images\moon.jpg" />
+    <None Include="wwwroot\resource\userprofile\images\2.jpg" />
+    <None Include="wwwroot\resource\userprofile\images\female_default.jpg" />
+    <None Include="wwwroot\resource\userprofile\images\male_default.jpg" />
   </ItemGroup>
-
+	<ItemGroup>
+		<None Update="wwwroot\resource\book\images\**\*">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="wwwroot\resource\category\images\**\*">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="wwwroot\resource\userprofile\images\**\*">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
 </Project>

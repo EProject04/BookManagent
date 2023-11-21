@@ -156,11 +156,14 @@ namespace BEWebtoon.Repositories
             if (updateUserProfileDto.File != null && updateUserProfileDto.File.Length > 0)
             {
                 string oldImageName = ImageHelper.UserAvatarName(updateUserProfileDto.Id);
-                string oldImagePath = Path.Combine(_env.ContentRootPath, "resource/userprofile/images", oldImageName);
-                File.Delete(oldImagePath);
+                string oldImagePath = Path.Combine(_env.ContentRootPath, "wwwroot/resource/userprofile/images", oldImageName);
+                if (File.Exists(oldImagePath))
+                {
+                    File.Delete(oldImagePath);
+                }
                 string newImageName = ImageHelper.UserAvatarName(updateUserProfileDto.Id);
-                string newImagePath = Path.Combine(_env.ContentRootPath, "resource/userprofile/images", newImageName);
-                using (var fileStream = new FileStream(newImagePath, FileMode.Create))
+                string newImagePath = Path.Combine(_env.ContentRootPath, "wwwroot/resource/userprofile/images", newImageName);
+                using (var fileStream = new FileStream(newImagePath, FileMode.Create, FileAccess.Write))
                 {
                     await updateUserProfileDto.File.CopyToAsync(fileStream);
                 }

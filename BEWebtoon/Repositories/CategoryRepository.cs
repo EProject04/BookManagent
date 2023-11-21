@@ -36,8 +36,8 @@ namespace BEWebtoon.Repositories
                 if (createCategoryDto.File != null && createCategoryDto.File.Length > 0)
                 {
                     string fileName = ImageHelper.ImageName(createCategoryDto.CategoryName);
-                    string filePath = Path.Combine(_env.ContentRootPath, "resource/category/images", fileName);
-                    using (var fileStream = new FileStream(filePath, FileMode.Create))
+                    string filePath = Path.Combine(_env.ContentRootPath, "wwwroot/resource/category/images", fileName);
+                    using (var fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write))
                     {
                         await createCategoryDto.File.CopyToAsync(fileStream);
                     }
@@ -172,18 +172,22 @@ namespace BEWebtoon.Repositories
                 if (updateCategoryDto.File != null && updateCategoryDto.File.Length > 0)
                 {
                     string oldImageName = ImageHelper.ImageName(category.CategoryName);
-                    string oldImagePath = Path.Combine(_env.ContentRootPath, "resource/category/images", oldImageName);
-                    File.Delete(oldImagePath);
+                    string oldImagePath = Path.Combine(_env.ContentRootPath, "wwwroot/resource/category/images", oldImageName);
+
+                    if (File.Exists(oldImagePath))
+                    {
+                        File.Delete(oldImagePath);
+                    }
                     string newImageName = ImageHelper.ImageName(updateCategoryDto.CategoryName);
-                    string newImagePath = Path.Combine(_env.ContentRootPath, "resource/category/images", newImageName);
-                    using (var fileStream = new FileStream(newImagePath, FileMode.Create))
+                    string newImagePath = Path.Combine(_env.ContentRootPath, "wwwroot/resource/category/images", newImageName);
+
+                    using (var fileStream = new FileStream(newImagePath, FileMode.Create, FileAccess.Write))
                     {
                         await updateCategoryDto.File.CopyToAsync(fileStream);
                     }
-                    data.CategoryName = updateCategoryDto.CategoryName;
-                    data.Description = updateCategoryDto.Description;
                     data.ImagePath = ImageHelper.CategoryImageUri(newImageName);
                 }
+
                 await _dBContext.SaveChangesAsync();
             }
         }

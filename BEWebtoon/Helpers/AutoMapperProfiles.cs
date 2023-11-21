@@ -25,6 +25,7 @@ namespace BEWebtoon.Helpers
             CreateMap<UpdateUserDto, User>();
             CreateMap<RegisterUserDto, User>();
             CreateMap<LoginUserDto, User>();
+            CreateMap<UserDto, LoginRequestBody>();
             #endregion
 
             #region Role

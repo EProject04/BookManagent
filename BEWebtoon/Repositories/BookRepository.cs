@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using BEWebtoon.DataTransferObject.BooksDto;
+using BEWebtoon.DataTransferObject.CategoriesDto;
 using BEWebtoon.Helpers;
 using BEWebtoon.Models;
 using BEWebtoon.Pagination;
@@ -62,7 +63,7 @@ namespace BEWebtoon.Repositories
                 if (createBookDto.File != null && createBookDto.File.Length > 0)
                 {
                     string fileName = ImageHelper.ImageName(createBookDto.Title);
-                    string filePath = Path.Combine(_env.ContentRootPath, "resource/book/images", fileName);
+                    string filePath = Path.Combine(_env.ContentRootPath, "wwwroot/resource/book/images", fileName);
                     using (var fileStream = new FileStream(filePath, FileMode.Create))
                     {
                         await createBookDto.File.CopyToAsync(fileStream);
@@ -230,11 +231,14 @@ namespace BEWebtoon.Repositories
                     if (updateBookDto.File != null && updateBookDto.File.Length > 0)
                     {
                         string oldImageName = ImageHelper.ImageName(book.Title);
-                        string oldImagePath = Path.Combine(_env.ContentRootPath, "resource/book/images", oldImageName);
-                        File.Delete(oldImagePath);
+                        string oldImagePath = Path.Combine(_env.ContentRootPath, "wwwroot/resource/book/images", oldImageName);
+                        if (File.Exists(oldImagePath))
+                        {
+                            File.Delete(oldImagePath);
+                        }
                         string newImageName = ImageHelper.ImageName(updateBookDto.Title);
-                        string newImagePath = Path.Combine(_env.ContentRootPath, "resource/book/images", newImageName);
-                        using (var fileStream = new FileStream(newImagePath, FileMode.Create))
+                        string newImagePath = Path.Combine(_env.ContentRootPath, "wwwroot/resource/book/images", newImageName);
+                        using (var fileStream = new FileStream(newImagePath, FileMode.Create, FileAccess.Write))
                         {
                             await updateBookDto.File.CopyToAsync(fileStream);
                         }

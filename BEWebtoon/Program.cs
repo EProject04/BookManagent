@@ -82,21 +82,21 @@ app.UseSession();
 app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new PhysicalFileProvider(
-        Path.Combine(Directory.GetCurrentDirectory(), "resource/book/images")),
+        Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/resource/book/images")),
     RequestPath = "/uploads/books"
 });
 
 app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new PhysicalFileProvider(
-        Path.Combine(Directory.GetCurrentDirectory(), "resource/category/images")),
+        Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/resource/category/images")),
     RequestPath = "/uploads/categories"
 });
 
 app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new PhysicalFileProvider(
-        Path.Combine(Directory.GetCurrentDirectory(), "resource/userprofile/images")),
+        Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/resource/userprofile/images")),
     RequestPath = "/uploads/userprofiles"
 });
 

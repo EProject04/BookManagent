@@ -23,12 +23,12 @@ namespace BEWebtoon.Helpers
         }
         public static string CategoryImageUri(string imageName)
         {
-            string imageUri = "https://aptechlearningproject.site/uploads/categories" + imageName;
+            string imageUri = "https://aptechlearningproject.site/uploads/categories/" + imageName;
             return imageUri;
         }
         public static string UserprofileImageUri(string imageName)
         {
-            string imageUri = "https://aptechlearningproject.site/uploads/userprofiles" + imageName;
+            string imageUri = "https://aptechlearningproject.site/uploads/userprofiles/" + imageName;
             return imageUri;
         }
     }
