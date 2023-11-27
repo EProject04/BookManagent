@@ -57,21 +57,6 @@ namespace BEWebtoon.Repositories
                 {
                     usersDto = _mapper.Map<List<UserProfile>, List<UserProfileDto>>(users);
                 }
-                foreach (var item in usersDto)
-                {
-                    if (item.ImagePath != null)
-                    {
-                        if (File.Exists(Path.Combine(item.ImagePath)))
-                        {
-                            byte[] imageArray = System.IO.File.ReadAllBytes(Path.Combine(item.ImagePath));
-                            item.Image = imageArray;
-                        }
-                        else
-                            item.Image = null;
-                    }
-                    else
-                        item.Image = null;
-                }
                 return usersDto;
             }
             return null;
@@ -84,18 +69,6 @@ namespace BEWebtoon.Repositories
             {
 
                 UserProfileDto userProfileDto = _mapper.Map<UserProfile, UserProfileDto>(userProfile);
-                if (userProfile.ImagePath != null)
-                {
-                    if (File.Exists(Path.Combine(userProfile.ImagePath)))
-                    {
-                        byte[] imageArray = System.IO.File.ReadAllBytes(Path.Combine(userProfile.ImagePath));
-                        userProfileDto.Image = imageArray;
-                    }
-                    else
-                        userProfileDto.Image = null;
-                }
-                else
-                    userProfileDto.Image = null;
                 return userProfileDto;
 
             }
@@ -127,21 +100,6 @@ namespace BEWebtoon.Repositories
                     }
                 }
                 var items = _mapper.Map<IEnumerable<UserProfileDto>>(query);
-                foreach (var item in items)
-                {
-                    if (item.ImagePath != null)
-                    {
-                        if (File.Exists(Path.Combine(item.ImagePath)))
-                        {
-                            byte[] imageArray = System.IO.File.ReadAllBytes(Path.Combine(item.ImagePath));
-                            item.Image = imageArray;
-                        }
-                        else
-                            item.Image = null;
-                    }
-                    else
-                        item.Image = null;
-                }
                 return PagedResult<UserProfileDto>.ToPagedList(items, request.PageIndex, request.PageSize);
             }
             return null;
@@ -149,76 +107,45 @@ namespace BEWebtoon.Repositories
 
         public async Task UpdateUserProfile(UpdateUserProfileDto updateUserProfileDto)
         {
-            using var transaction = await _dBContext.Database.BeginTransactionAsync();
+            if (_sessionManager.CheckLogin())
+            {
+                using var transaction = await _dBContext.Database.BeginTransactionAsync();
 
-            var userProfile = await _dBContext.UserProfiles.Where(x => x.Id == updateUserProfileDto.Id).FirstOrDefaultAsync();
+                var userProfile = await _dBContext.UserProfiles.Where(x => x.Id == updateUserProfileDto.Id).FirstOrDefaultAsync();
+                var data = _mapper.Map<UserProfile>(userProfile);
 
-            if (updateUserProfileDto.File != null && updateUserProfileDto.File.Length > 0)
-            {
-                string oldImageName = ImageHelper.UserAvatarName(updateUserProfileDto.Id);
-                string oldImagePath = Path.Combine(_env.ContentRootPath, "wwwroot/resource/userprofile/images", oldImageName);
-                if (File.Exists(oldImagePath))
+                if (updateUserProfileDto.File != null && updateUserProfileDto.File.Length > 0)
                 {
-                    File.Delete(oldImagePath);
+                    string oldImageName = ImageHelper.UserAvatarName(updateUserProfileDto.Id);
+                    string oldImagePath = Path.Combine(_env.ContentRootPath, "wwwroot/resource/userprofile/images", oldImageName);
+                    if (File.Exists(oldImagePath))
+                    {
+                        File.Delete(oldImagePath);
+                    }
+                    string newImageName = ImageHelper.UserAvatarName(updateUserProfileDto.Id);
+                    string newImagePath = Path.Combine(_env.ContentRootPath, "wwwroot/resource/userprofile/images", newImageName);
+                    using (var fileStream = new FileStream(newImagePath, FileMode.Create, FileAccess.Write))
+                    {
+                        await updateUserProfileDto.File.CopyToAsync(fileStream);
+                    }
+                    data.ImagePath = ImageHelper.UserprofileImageUri(newImageName);
                 }
-                string newImageName = ImageHelper.UserAvatarName(updateUserProfileDto.Id);
-                string newImagePath = Path.Combine(_env.ContentRootPath, "wwwroot/resource/userprofile/images", newImageName);
-                using (var fileStream = new FileStream(newImagePath, FileMode.Create, FileAccess.Write))
+                else
                 {
-                    await updateUserProfileDto.File.CopyToAsync(fileStream);
+                    data.ImagePath = "https://aptechlearningproject.site/uploads/userprofiles/male_default.jpg";
                 }
-                userProfile.ImagePath = ImageHelper.UserprofileImageUri(newImageName);
-            }
-            else
-            {
-                userProfile.ImagePath = "https://aptechlearningproject.site/uploads/userprofiles/male_default.jpg";
-            }
-            try
-            {
-                if (userProfile.FistName != null)
+                if (updateUserProfileDto.LastName != null || updateUserProfileDto.FirstName != null)
                 {
-                    userProfile.FistName = updateUserProfileDto.FistName;
-                }
-                if (userProfile.LastName != null)
-                {
-                    userProfile.LastName = updateUserProfileDto.LastName;
-                }
-                if (userProfile.LastName != null && userProfile.FistName != null)
-                {
-                    userProfile.FullName = updateUserProfileDto.FistName + ' ' + updateUserProfileDto.LastName;
-                }
-                if (userProfile.PhoneNumber != null)
-                {
-                    userProfile.PhoneNumber = updateUserProfileDto.PhoneNumber;
-                }
-                if (userProfile.Address != null)
-                {
-                    userProfile.Address = updateUserProfileDto.Address;
-                }
-                if (userProfile.ImagePath != null)
-                {
-                    userProfile.ImagePath = updateUserProfileDto.ImagePath;
-                }
-                if (userProfile.Gender != null)
-                {
-                    userProfile.Gender = updateUserProfileDto.Gender;
-                }
-                if (userProfile.DateOfBirth != null)
-                {
-                    userProfile.DateOfBirth = updateUserProfileDto.DateOfBirth;
-                }
-                if (userProfile.Email != null)
-                {
-                    userProfile.Email = updateUserProfileDto.Email;
+                    data.FistName = updateUserProfileDto.FirstName ?? data.FistName;
+
+                    data.LastName = updateUserProfileDto.LastName ?? data.LastName;
+
+                    data.FullName = $"{data.FistName} {data.LastName}";
                 }
                 await _dBContext.SaveChangesAsync();
                 await transaction.CommitAsync();
             }
-            catch (Exception ex)
-            {
-                await transaction.RollbackAsync();
-                throw new CustomException("Failed to update the comment: " + ex.Message);
-            }
+               
         }
     }
 }

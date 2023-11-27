@@ -1,7 +1,5 @@
 ﻿using AutoMapper;
 using BEWebtoon.DataTransferObject.CategoriesDto;
-using BEWebtoon.DataTransferObject.UserProfilesDto;
-using BEWebtoon.DataTransferObject.UsersDto;
 using BEWebtoon.Helpers;
 using BEWebtoon.Models;
 using BEWebtoon.Pagination;
@@ -83,21 +81,6 @@ namespace BEWebtoon.Repositories
                     categoriesDto = _mapper.Map<List<Category>, List<CategoryDto>>(categories);
 
                 }
-                foreach (var item in categoriesDto)
-                {
-                    if (item.ImagePath != null)
-                    {
-                        if (File.Exists(Path.Combine(item.ImagePath)))
-                        {
-                            byte[] imageArray = System.IO.File.ReadAllBytes(Path.Combine(item.ImagePath));
-                            item.Image = imageArray;
-                        }
-                        else
-                            item.Image = null;
-                    }
-                    else
-                        item.Image = null;
-                }
                 return categoriesDto;
             }
             return null;
@@ -112,19 +95,6 @@ namespace BEWebtoon.Repositories
                 {
 
                     CategoryDto categoryDto = _mapper.Map<Category, CategoryDto>(category);
-                    if (category.ImagePath != null)
-                    {
-                        if (File.Exists(Path.Combine(category.ImagePath)))
-                        {
-                            byte[] imageArray = System.IO.File.ReadAllBytes(Path.Combine(category.ImagePath));
-                            categoryDto.Image = imageArray;
-                        }
-                        else
-                            categoryDto.Image = null;
-                    }
-                    else
-                        categoryDto.Image = null;
-
                     return categoryDto;
 
                 }
@@ -144,21 +114,6 @@ namespace BEWebtoon.Repositories
                 query = query.Where(x => x.CategoryName.ToLower().Contains(request.keyword.ToLower())
                                         || SearchHelper.ConvertToUnSign(x.CategoryName).ToLower().Contains(request.keyword.ToLower())).ToList();
             var items = _mapper.Map<IEnumerable<CategoryDto>>(query);
-            foreach (var item in items)
-            {
-                if (item.ImagePath != null)
-                {
-                    if (File.Exists(Path.Combine(item.ImagePath)))
-                    {
-                        byte[] imageArray = System.IO.File.ReadAllBytes(Path.Combine(item.ImagePath));
-                        item.Image = imageArray;
-                    }
-                    else
-                        item.Image = null;
-                }
-                else
-                    item.Image = null;
-            }
             return PagedResult<CategoryDto>.ToPagedList(items, request.PageIndex, request.PageSize);
             
         }

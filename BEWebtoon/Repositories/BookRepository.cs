@@ -115,21 +115,29 @@ namespace BEWebtoon.Repositories
                 if (books != null)
                 {
                     booksDto = _mapper.Map<List<Book>, List<BookDto>>(books);
-                }
-                foreach (var item in booksDto)
-                {
-                    if (item.ImagePath != null)
+                    foreach (var item in booksDto)
                     {
-                        if (File.Exists(Path.Combine(item.ImagePath)))
+                        double? averageRate = item.Comments
+                                .Where(comment => comment.Rate.HasValue)
+                                .Average(comment => comment.Rate);
+                        string stringValue = averageRate.ToString();
+
+                        if (stringValue.Contains("."))
                         {
-                            byte[] imageArray = System.IO.File.ReadAllBytes(Path.Combine(item.ImagePath));
-                            item.Image = imageArray;
+                            // Lấy phần số nguyên
+                            string integerPart = stringValue.Split('.')[0];
+
+                            // Lấy một chữ số sau dấu phẩy
+                            string decimalPart = stringValue.Split('.')[1].Substring(0, 1);
+
+                            // Kết hợp phần số nguyên và một chữ số thập phân
+                            item.AverageRate = integerPart + "." + decimalPart;
                         }
                         else
-                            item.Image = null;
+                        {
+                            item.AverageRate = stringValue;
+                        }
                     }
-                    else
-                        item.Image = null;
                 }
                 return booksDto;
             }
@@ -159,22 +167,32 @@ namespace BEWebtoon.Repositories
                 query = query.Where(b => b.CategoryBooks.Any(bf => bf.Categories.CategoryName.TrimAndLower().Contains(request.CategoryName.TrimAndLower())
                                                            || SearchHelper.ConvertToUnSign(bf.Categories.CategoryName).TrimAndLower().Contains(request.CategoryName.TrimAndLower()))).ToList();
             }
+            
             var items = _mapper.Map<IEnumerable<BookDto>>(query);
             foreach (var item in items)
             {
-                if (item.ImagePath != null)
+                double? averageRate = item.Comments
+                        .Where(comment => comment.Rate.HasValue)
+                        .Average(comment => comment.Rate);
+                string stringValue = averageRate.ToString();
+
+                if (stringValue.Contains("."))
                 {
-                    if (File.Exists(Path.Combine(item.ImagePath)))
-                    {
-                        byte[] imageArray = System.IO.File.ReadAllBytes(Path.Combine(item.ImagePath));
-                        item.Image = imageArray;
-                    }
-                    else
-                        item.Image = null;
+                    // Lấy phần số nguyên
+                    string integerPart = stringValue.Split('.')[0];
+
+                    // Lấy một chữ số sau dấu phẩy
+                    string decimalPart = stringValue.Split('.')[1].Substring(0, 1);
+
+                    // Kết hợp phần số nguyên và một chữ số thập phân
+                    item.AverageRate = integerPart + "." + decimalPart;
                 }
                 else
-                    item.Image = null;
+                {
+                    item.AverageRate = stringValue;
+                }
             }
+            
             return PagedResult<BookDto>.ToPagedList(items, request.PageIndex, request.PageSize);
         }
 
@@ -192,21 +210,32 @@ namespace BEWebtoon.Repositories
                 {
 
                 BookDto bookDto = _mapper.Map<Book, BookDto>(book);
-                if (book.ImagePath != null)
+               
+
+                double? averageRate = book.Comments
+                        .Where(comment => comment.Rate.HasValue)
+                        .Average(comment => comment.Rate);
+                string stringValue = averageRate.ToString();
+
+                if (stringValue.Contains("."))
                 {
-                    if (File.Exists(Path.Combine(book.ImagePath)))
-                    {
-                        byte[] imageArray = System.IO.File.ReadAllBytes(Path.Combine(book.ImagePath));
-                        bookDto.Image = imageArray;
-                    }
-                    else
-                        bookDto.Image = null;
+                    // Lấy phần số nguyên
+                    string integerPart = stringValue.Split('.')[0];
+
+                    // Lấy một chữ số sau dấu phẩy
+                    string decimalPart = stringValue.Split('.')[1].Substring(0, 1);
+
+                    // Kết hợp phần số nguyên và một chữ số thập phân
+                    bookDto.AverageRate = integerPart + "." + decimalPart;
                 }
                 else
-                    bookDto.Image = null;
+                {
+                    bookDto.AverageRate = stringValue;
+                }
+
                 return bookDto;
 
-                }
+            }
                 else
                 {
                     throw new Exception("Khong tim thay sach");
@@ -242,27 +271,11 @@ namespace BEWebtoon.Repositories
                         {
                             await updateBookDto.File.CopyToAsync(fileStream);
                         }
-                        data.ImagePath = ImageHelper.BookImageUri(newImageName);
+                        data.ImagePath = ImageHelper.BookImageUri(newImagePath);
                     }
                     await _dBContext.SaveChangesAsync();
                 }
             }
         }
-        private async Task ProcessBookData(Book book, CreateOrUpdateBookDto bookDto)
-        {
-            book.CategoryBooks = bookDto.CategoryId.Select(categoryId => new CategoryBook { CategoryId = categoryId }).ToList();
-            book.BookFollows = bookDto.AuthorId.Select(authorId => new BookFollow { AuthorId = authorId }).ToList();
-
-            if (bookDto.File != null && bookDto.File.Length > 0)
-            {
-                if (bookDto.ImagePath != null)
-                {
-                    if (File.Exists(Path.Combine(bookDto.ImagePath)))
-                        File.Delete(Path.Combine(bookDto.ImagePath));
-                }
-                book.ImagePath = await FileHelper.SaveFile(bookDto.File, "BookImage");
-            }
-        }
-
     }
 }
