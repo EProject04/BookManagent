@@ -250,12 +250,28 @@ namespace BEWebtoon.Repositories
                 var data = _mapper.Map<Book>(book);
                 if (book != null)
                 {
-                    data.CategoryBooks = updateBookDto.CategoryId.Select(categoryId => new CategoryBook { CategoryId = categoryId }).ToList();
-                    data.BookFollows = updateBookDto.AuthorId.Select(authorId => new BookFollow { AuthorId = authorId }).ToList();
-                    data.Title = updateBookDto.Title;
-                    data.Description = updateBookDto.Description;
-                    data.Content = updateBookDto.Content;
-                    data.Status = updateBookDto.Status;
+                    if (updateBookDto.CategoryId != null)
+                    {
+                        foreach (var categoryId in updateBookDto.CategoryId)
+                        {
+                            if (!data.CategoryBooks.Any(cb => cb.CategoryId == categoryId))
+                            {
+                                data.CategoryBooks.Add(new CategoryBook { CategoryId = categoryId });
+                            }
+                        }
+                    }
+
+                    if (updateBookDto.AuthorId != null)
+                    {
+                        foreach (var authorId in updateBookDto.AuthorId)
+                        {
+                            if (!data.BookFollows.Any(bf => bf.AuthorId == authorId))
+                            {
+                                data.BookFollows.Add(new BookFollow { AuthorId = authorId });
+                            }
+                        }
+                    }
+
 
                     if (updateBookDto.File != null && updateBookDto.File.Length > 0)
                     {

@@ -40,28 +40,6 @@ namespace BEWebtoon.Repositories
                     followingsDto = _mapper.Map<List<Following>, List<FollowingDto>>(followings);
 
                 }
-                foreach (var item in followingsDto)
-                {
-                    if (item.Books != null)
-                    {
-                        foreach (var i in item.Books)
-                        {
-                            if (i.ImagePath != null)
-                            {
-                                if (File.Exists(Path.Combine(i.ImagePath)))
-                                {
-                                    byte[] imageArray = System.IO.File.ReadAllBytes(Path.Combine(i.ImagePath));
-                                    i.Image = imageArray;
-                                }
-                                else
-                                    i.Image = null;
-                            }
-                            else
-                                i.Image = null;
-                        }
-                    }
-                }
-
                 return followingsDto;
             }
             else
@@ -79,26 +57,6 @@ namespace BEWebtoon.Repositories
                 if (following != null)
                 {
                     FollowingDto followingDto = _mapper.Map<Following, FollowingDto>(following);
-
-                    if (followingDto.Books != null)
-                    {
-
-                        foreach (var i in followingDto.Books)
-                        {
-                            if (i.ImagePath != null)
-                            {
-                                if (File.Exists(Path.Combine(i.ImagePath)))
-                                {
-                                    byte[] imageArray = System.IO.File.ReadAllBytes(Path.Combine(i.ImagePath));
-                                    i.Image = imageArray;
-                                }
-                                else
-                                    i.Image = null;
-                            }
-                            else
-                                i.Image = null;
-                        }
-                    }
                     return followingDto;
                 }
                 else
@@ -131,22 +89,6 @@ namespace BEWebtoon.Repositories
                                                     || SearchHelper.ConvertToUnSign(x.Title).ToLower().Contains(request.keyword.ToLower())).ToList();
 
                         item.Books = item.Books.Skip((request.PageIndex - 1) * request.PageSize).Take(request.PageSize).ToList();
-                        foreach (var i in item.Books)
-                        {
-
-                            if (i.ImagePath != null)
-                            {
-                                if (File.Exists(Path.Combine(i.ImagePath)))
-                                {
-                                    byte[] imageArray = System.IO.File.ReadAllBytes(Path.Combine(i.ImagePath));
-                                    i.Image = imageArray;
-                                }
-                                else
-                                    i.Image = null;
-                            }
-                            else
-                                i.Image = null;
-                        }
                     }
                 }
                 return PagedResult<FollowingDto>.ToPagedList(items, request.PageIndex, request.PageSize);
@@ -173,20 +115,17 @@ namespace BEWebtoon.Repositories
                         .Where(book => updateFollowingDto.BookIds.Contains(book.Id))
                         .ToListAsync();
 
-                    foreach (var book in following.Books.ToList())
+                    var booksToRemove = following.Books.Except(booksToFollow).ToList();
+                    var booksToAdd = booksToFollow.Except(following.Books).ToList();
+
+                    foreach (var book in booksToRemove)
                     {
-                        if (!booksToFollow.Contains(book))
-                        {
-                            following.Books.Remove(book);
-                        }
+                        following.Books.Remove(book);
                     }
 
-                    foreach (var book in booksToFollow)
+                    foreach (var book in booksToAdd)
                     {
-                        if (!following.Books.Contains(book))
-                        {
-                            following.Books.Add(book);
-                        }
+                        following.Books.Add(book);
                     }
 
                     await _dBContext.SaveChangesAsync();
