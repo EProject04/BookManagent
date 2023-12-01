@@ -28,6 +28,16 @@ namespace BEWebtoon.Services
             return await _bookRepository.GetAll();
         }
 
+        public async Task<BookDto> GetAllCommentByRate(int rate, int bookId)
+        {
+            return await _bookRepository.GetAllCommentByRate(rate, bookId);
+        }
+
+        public async Task<BookDto> GetAllCommentByUserID(int userID, int bookId)
+        {
+            return await _bookRepository.GetAllCommentByUserID(userID, bookId);
+        }
+
         public Task<PagedResult<BookDto>> GetBookPagination(BookRequest request)
         {
             return _bookRepository.GetBookPagination(request);  

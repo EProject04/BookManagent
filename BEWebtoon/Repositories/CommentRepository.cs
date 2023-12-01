@@ -81,7 +81,7 @@ namespace BEWebtoon.Repositories
 
         public async Task<List<CommentDto>> GetAll()
         {
-            if (_sessionManager.CheckRole(ROLE_CONSTANTS.AdminAuthor))
+            if (_sessionManager.CheckRole(ROLE_CONSTANTS.Admin))
             {
                 List<CommentDto> commnetsDto = new List<CommentDto>();
                 var comments = await _dBContext.Comments.ToListAsync();
@@ -96,7 +96,7 @@ namespace BEWebtoon.Repositories
 
         public async Task<CommentDto> GetById(int id)
         {
-            if (_sessionManager.CheckRole(ROLE_CONSTANTS.AdminAuthor))
+            if (_sessionManager.CheckRole(ROLE_CONSTANTS.Admin))
             {
                 var comment = await _dBContext.Comments.FindAsync(id);
                 if (comment != null)

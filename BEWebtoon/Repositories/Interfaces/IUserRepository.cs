@@ -9,7 +9,6 @@ namespace BEWebtoon.Repositories.Interfaces
         Task<List<UserDto>> GetAll();
         Task<UserDto> GetById(int id);
         Task CreateUser(CreateUserDto user);
-        Task UpdateUser(UpdateUserDto user);
         Task DeleteUser(int id);
         Task<PagedResult<UserDto>> GetUserPagination(SeacrhPagingRequest request);
         Task RegisterUser(RegisterUserDto userDto);

@@ -111,7 +111,7 @@ namespace BEWebtoon.Repositories
             {
                 using var transaction = await _dBContext.Database.BeginTransactionAsync();
 
-                var userProfile = await _dBContext.UserProfiles.Where(x => x.Id == updateUserProfileDto.Id).FirstOrDefaultAsync();
+                var userProfile = await _dBContext.UserProfiles.Include(x => x.Users).Where(x => x.Id == updateUserProfileDto.Id).FirstOrDefaultAsync();
                 var data = _mapper.Map<UserProfile>(userProfile);
 
                 if (updateUserProfileDto.File != null && updateUserProfileDto.File.Length > 0)
@@ -130,10 +130,6 @@ namespace BEWebtoon.Repositories
                     }
                     data.ImagePath = ImageHelper.UserprofileImageUri(newImageName);
                 }
-                else
-                {
-                    data.ImagePath = "https://aptechlearningproject.site/uploads/userprofiles/male_default.jpg";
-                }
                 if (updateUserProfileDto.LastName != null || updateUserProfileDto.FirstName != null)
                 {
                     data.FistName = updateUserProfileDto.FirstName ?? data.FistName;
@@ -141,6 +137,10 @@ namespace BEWebtoon.Repositories
                     data.LastName = updateUserProfileDto.LastName ?? data.LastName;
 
                     data.FullName = $"{data.FistName} {data.LastName}";
+                }
+                if (userProfile.Users != null)
+                {
+                    userProfile.Users.Email = updateUserProfileDto.Email ?? userProfile.Users.Email;
                 }
                 await _dBContext.SaveChangesAsync();
                 await transaction.CommitAsync();

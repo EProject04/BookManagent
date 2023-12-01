@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BEWebtoon.DataTransferObject.BooksDto;
 using BEWebtoon.DataTransferObject.CategoriesDto;
+using BEWebtoon.DataTransferObject.CommentsDto;
 using BEWebtoon.Helpers;
 using BEWebtoon.Models;
 using BEWebtoon.Pagination;
@@ -11,6 +12,7 @@ using IOC.ApplicationLayer.Utilities;
 using IOCBEWebtoon.Utilities;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.EntityFrameworkCore;
+using System.Net;
 
 namespace BEWebtoon.Repositories
 {
@@ -144,6 +146,57 @@ namespace BEWebtoon.Repositories
             return null;
         }
 
+        public async Task<BookDto> GetAllCommentByRate(int rate, int bookId)
+        {
+            if (_sessionManager.CheckLogin())
+            {
+                var book = await _dBContext.Books
+                    .Include(x => x.Comments)
+                        .ThenInclude(x => x.UserProfiles)
+                    .FirstOrDefaultAsync(b => b.Id == bookId);
+
+                if (book != null)
+                {
+                    var filteredComments = book.Comments.Where(c => c.Rate == rate).ToList();
+
+                    var bookDto = _mapper.Map<Book, BookDto>(book);
+
+                    bookDto.Comments = _mapper.Map<List<CommentDto>>(filteredComments);
+
+                    return bookDto;
+                }
+            }
+
+            return null;
+        }
+
+
+        public async Task<BookDto> GetAllCommentByUserID(int userID, int bookID)
+        {
+            if (_sessionManager.CheckLogin())
+            {
+                var book = await _dBContext.Books
+                    .Include(x => x.Comments)
+                        .ThenInclude(x => x.UserProfiles)
+                    .FirstOrDefaultAsync(b => b.Id == bookID);
+
+                if (book != null)
+                {
+                    // Filter comments based on the userID
+                    var filteredComments = book.Comments.Where(c => c.UserProfiles.Id == userID).ToList();
+
+                    var bookDto = _mapper.Map<Book, BookDto>(book);
+
+                    bookDto.Comments = _mapper.Map<List<CommentDto>>(filteredComments);
+
+                    return bookDto;
+                }
+            }
+
+            return null;
+        }
+
+
         public async Task<PagedResult<BookDto>> GetBookPagination(BookRequest request)
         {
             var query = await _dBContext.Books
@@ -157,10 +210,18 @@ namespace BEWebtoon.Repositories
             if (!string.IsNullOrEmpty(request.keyword.TrimAndLower()))
                 query = query.Where(x => x.Title.ToLower().Contains(request.keyword.ToLower())
                                         || SearchHelper.ConvertToUnSign(x.Title).ToLower().Contains(request.keyword.ToLower())).ToList();
+            if (!string.IsNullOrEmpty(request.AuthorID.ToString()))
+            {
+                query = query.Where(b => b.BookFollows.Any(bf => bf.Authors.Id == request.AuthorID)).ToList();
+            }
             if (!string.IsNullOrEmpty(request.AuthorName.TrimAndLower()))
             {
                 query = query.Where(b => b.BookFollows.Any(bf => bf.Authors.AuthorName.TrimAndLower().Contains(request.AuthorName.TrimAndLower())
                                                            || SearchHelper.ConvertToUnSign(bf.Authors.AuthorName).TrimAndLower().Contains(request.AuthorName.TrimAndLower()))).ToList();
+            }
+            if (!string.IsNullOrEmpty(request.CategoryID.ToString()))
+            {
+                query = query.Where(b => b.CategoryBooks.Any(bf => bf.Categories.Id == request.CategoryID)).ToList();
             }
             if (!string.IsNullOrEmpty(request.CategoryName.TrimAndLower()))
             {

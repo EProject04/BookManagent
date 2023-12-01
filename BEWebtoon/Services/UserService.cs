@@ -59,9 +59,5 @@ namespace BEWebtoon.Services
             await _userRepository.RegisterUser(userDto);
         }
 
-        public async Task UpdateUser(UpdateUserDto user)
-        {
-           await _userRepository.UpdateUser(user);
-        }
     }
 }

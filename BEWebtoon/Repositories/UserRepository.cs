@@ -144,25 +144,6 @@ namespace BEWebtoon.Repositories
             }
             return null;
         }
-
-        public async Task UpdateUser(UpdateUserDto userDto)
-        {
-            if (_sessionManager.CheckRole(ROLE_CONSTANTS.Admin))
-            { 
-                await _dBContext.Database.BeginTransactionAsync();
-                var user = await _dBContext.Users.Where(x => x.Id == userDto.Id).FirstOrDefaultAsync();
-                if (user != null)
-                {
-                    _dBContext.Entry(user).CurrentValues.SetValues(userDto);
-                    await _dBContext.SaveChangesAsync();
-                    await _dBContext.Database.CommitTransactionAsync();
-                }
-                else
-                {
-                    throw new Exception("Khong tim thay nguoi dung");
-                }
-            }
-        }
        
 
         public async Task<PagedResult<UserDto>> GetUserPagination(SeacrhPagingRequest request)

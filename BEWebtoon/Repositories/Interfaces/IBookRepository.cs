@@ -9,6 +9,8 @@ namespace BEWebtoon.Repositories.Interfaces
     {
         Task<List<BookDto>> GetAll();
         Task<BookDto> GetById(int id);
+        Task<BookDto> GetAllCommentByRate(int rate, int bookId);
+        Task<BookDto> GetAllCommentByUserID(int userID, int bookID);
         Task CreateBook(CreateBookDto createBookDto);
         Task UpdateBook(UpdateBookDto updateBookDto);
         Task DeleteBook(int id);

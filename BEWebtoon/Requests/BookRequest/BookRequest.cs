@@ -6,8 +6,8 @@ namespace BEWebtoon.Requests.BookRequest
     {
         public string? keyword { get; set; }
         public string? CategoryName { get; set; }
-        public string? CategoryID { get; set; }
+        public int? CategoryID { get; set; }
         public string? AuthorName { get; set; }
-        public string? AuthorID { get; set; }
+        public int? AuthorID { get; set; }
     }
 }

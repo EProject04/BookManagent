@@ -57,8 +57,8 @@ namespace BEWebtoon.Controllers
             }
 
         }
-        [HttpPut("update-following/{id}")]
-        public async Task<IActionResult> Updatefollowing([FromForm] UpdateFollowingDto followingDto)
+        [HttpPut("update-following")]
+        public async Task<IActionResult> Updatefollowing(UpdateFollowingDto followingDto)
         {
             try
             {

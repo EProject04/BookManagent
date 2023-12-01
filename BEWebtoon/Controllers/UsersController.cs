@@ -71,25 +71,6 @@ namespace BEWebtoon.Controllers
 
         }
 
-        [HttpPut("update-user/{id}")]
-        public async Task<IActionResult> UpdateUser(UpdateUserDto userDto)
-        {
-            try
-            {
-                if (!ModelState.IsValid)
-                    return BadRequest("Du lieu khong hop le");
-                var data = await _userService.GetById(userDto.Id);
-                if (data == null)
-                    return NotFound();
-                await _userService.UpdateUser(userDto);
-                return Ok(200);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.ToString());
-            }
-        }
-
         [HttpPost("forgot-password")]
         public async Task<IActionResult> ForgotPassword(ForgotPasswordDto forgotPasswordDto)
         {

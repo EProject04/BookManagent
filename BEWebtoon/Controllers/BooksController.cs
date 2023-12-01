@@ -1,4 +1,5 @@
 ﻿using BEWebtoon.DataTransferObject.BooksDto;
+using BEWebtoon.DataTransferObject.CommentsDto;
 using BEWebtoon.DataTransferObject.RolesDto;
 using BEWebtoon.DataTransferObject.UserProfilesDto;
 using BEWebtoon.Requests.BookRequest;
@@ -38,6 +39,31 @@ namespace BEWebtoon.Controllers
             try
             {
                 return await _bookService.GetById(id);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.ToString());
+            }
+        }
+
+        [HttpGet("get-all-comment-by-userid")]
+        public async Task<ActionResult<BookDto>> GetAllCommentByUserID(int userId, int bookId)
+        {
+            try
+            {
+                return await _bookService.GetAllCommentByUserID(userId, bookId);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.ToString());
+            }
+        }
+        [HttpGet("get-all-comment-by-rate")]
+        public async Task<ActionResult<BookDto>> GetAllCommentByRate(int rate, int bookId)
+        {
+            try
+            {
+                return await _bookService.GetAllCommentByRate(rate, bookId);
             }
             catch (Exception ex)
             {
