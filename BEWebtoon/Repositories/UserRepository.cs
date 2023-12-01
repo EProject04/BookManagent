@@ -127,22 +127,18 @@ namespace BEWebtoon.Repositories
 
         public async Task<UserDto> GetById(int id)
         {
-            if (_sessionManager.CheckRole(ROLE_CONSTANTS.Admin))
+            var user = await _dBContext.Users.FindAsync(id);
+            if (user != null)
             {
-                var user = await _dBContext.Users.FindAsync(id);
-                if (user != null)
-                {
 
-                    UserDto userDto = _mapper.Map<User, UserDto>(user);
-                    return userDto;
+                UserDto userDto = _mapper.Map<User, UserDto>(user);
+                return userDto;
 
-                }
-                else
-                {
-                    throw new Exception("Khong tim thay nguoi dung");
-                }
             }
-            return null;
+            else
+            {
+                throw new Exception("Khong tim thay nguoi dung");
+            }
         }
        
 
@@ -206,6 +202,24 @@ namespace BEWebtoon.Repositories
             }
            
         }
+        public async Task UpdateUser(UpdateUserDto userDto)
+        {
+            if (_sessionManager.CheckRole(ROLE_CONSTANTS.Admin))
+            {
+                await _dBContext.Database.BeginTransactionAsync();
+                var user = await _dBContext.Users.Where(x => x.Id == userDto.Id).FirstOrDefaultAsync();
+                if (user != null)
+                {
+                    _dBContext.Entry(user).CurrentValues.SetValues(userDto);
+                    await _dBContext.SaveChangesAsync();
+                    await _dBContext.Database.CommitTransactionAsync();
+                }
+                else
+                {
+                    throw new Exception("Khong tim thay nguoi dung");
+                }
+            }
+        }
 
         public async Task LoginUser(LoginUserDto userDto)
         {
@@ -228,8 +242,12 @@ namespace BEWebtoon.Repositories
 
         public async Task Logout()
         {
-            _sessionManager.Logout();
-            return;
+            if (_sessionManager.CheckLogin())
+            {
+                _sessionManager.Logout();
+                return;
+            }
+           
         }
         public async Task ForgotPassword(ForgotPasswordDto forgotPasswordDto)
         {
@@ -241,41 +259,8 @@ namespace BEWebtoon.Repositories
             userInfo.Password =forgotPasswordDto.NewPassword;
             await _dBContext.SaveChangesAsync();
 
-            /*            var token = await GeneratePasswordResetTokenAsync(userInfo);
-
-                        var resetLink = $"https://yourdomain.com/reset-password?email={forgotPasswordDto.Email}&token={Uri.EscapeDataString(token)}";
-
-                        await SendResetPasswordEmail(forgotPasswordDto.Email, resetLink);*/
+           
         }
 
-       /* private async Task SendResetPasswordEmail(string email, string resetLink)
-        {
-            var apiKey = _configuration.GetSection("SendGrid:ApiKey").Value;
-            var fromEmail = new MailAddress(_configuration.GetSection("SendGrid:FromEmail").Value);
-            var toEmail = new MailAddress(email);
-            var subject = "Reset Password Request";
-            var body = $"Please reset your password by clicking here: {resetLink}";
-
-            using (var mail = new MailMessage(fromEmail, toEmail))
-            {
-                mail.Subject = subject;
-                mail.Body = body;
-                mail.IsBodyHtml = true;
-
-                using (var client = new SmtpClient("smtp.sendgrid.net", 587))
-                {
-                    client.UseDefaultCredentials = false;
-                    client.Credentials = new System.Net.NetworkCredential("apikey", apiKey);
-                    client.EnableSsl = true;
-
-                    await client.SendMailAsync(mail);
-                }
-            }
-        }
-        public async Task<string> GeneratePasswordResetTokenAsync(User user)
-        {
-            var token = Guid.NewGuid().ToString(); 
-            return token;
-        }*/
     }
 }

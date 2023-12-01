@@ -113,35 +113,54 @@ namespace BEWebtoon.Repositories
 
                 var userProfile = await _dBContext.UserProfiles.Include(x => x.Users).Where(x => x.Id == updateUserProfileDto.Id).FirstOrDefaultAsync();
                 var data = _mapper.Map<UserProfile>(userProfile);
-
-                if (updateUserProfileDto.File != null && updateUserProfileDto.File.Length > 0)
+                if (userProfile != null)
                 {
-                    string oldImageName = ImageHelper.UserAvatarName(updateUserProfileDto.Id);
-                    string oldImagePath = Path.Combine(_env.ContentRootPath, "wwwroot/resource/userprofile/images", oldImageName);
-                    if (File.Exists(oldImagePath))
+                    if (updateUserProfileDto.File != null && updateUserProfileDto.File.Length > 0)
                     {
-                        File.Delete(oldImagePath);
+                        string oldImageName = ImageHelper.UserAvatarName(updateUserProfileDto.Id);
+                        string oldImagePath = Path.Combine(_env.ContentRootPath, "wwwroot/resource/userprofile/images", oldImageName);
+                        if (File.Exists(oldImagePath))
+                        {
+                            File.Delete(oldImagePath);
+                        }
+                        string newImageName = ImageHelper.UserAvatarName(updateUserProfileDto.Id);
+                        string newImagePath = Path.Combine(_env.ContentRootPath, "wwwroot/resource/userprofile/images", newImageName);
+                        using (var fileStream = new FileStream(newImagePath, FileMode.Create, FileAccess.Write))
+                        {
+                            await updateUserProfileDto.File.CopyToAsync(fileStream);
+                        }
+                        data.ImagePath = ImageHelper.UserprofileImageUri(newImageName);
                     }
-                    string newImageName = ImageHelper.UserAvatarName(updateUserProfileDto.Id);
-                    string newImagePath = Path.Combine(_env.ContentRootPath, "wwwroot/resource/userprofile/images", newImageName);
-                    using (var fileStream = new FileStream(newImagePath, FileMode.Create, FileAccess.Write))
+                    if (updateUserProfileDto.LastName != null || updateUserProfileDto.FirstName != null)
                     {
-                        await updateUserProfileDto.File.CopyToAsync(fileStream);
+                        data.FistName = updateUserProfileDto.FirstName ?? data.FistName;
+
+                        data.LastName = updateUserProfileDto.LastName ?? data.LastName;
+
+                        data.FullName = $"{data.FistName} {data.LastName}";
                     }
-                    data.ImagePath = ImageHelper.UserprofileImageUri(newImageName);
+                    if (userProfile.Users != null)
+                    {
+                        userProfile.Users.Email = updateUserProfileDto.Email ?? userProfile.Users.Email;
+                    }
+                    if (updateUserProfileDto.Address != null)
+                    {
+                        data.Address = updateUserProfileDto.Address ?? data.Address;
+                    }
+                    if (updateUserProfileDto.DateOfBirth != null)
+                    {
+                        data.DateOfBirth = updateUserProfileDto.DateOfBirth ?? data.DateOfBirth;
+                    }
+                    if (updateUserProfileDto.PhoneNumber != null)
+                    {
+                        data.PhoneNumber = updateUserProfileDto.PhoneNumber ?? data.PhoneNumber;
+                    }
+                    if (updateUserProfileDto.Gender != null)
+                    {
+                        data.Gender = updateUserProfileDto.Gender ?? data.Gender;
+                    }
                 }
-                if (updateUserProfileDto.LastName != null || updateUserProfileDto.FirstName != null)
-                {
-                    data.FistName = updateUserProfileDto.FirstName ?? data.FistName;
-
-                    data.LastName = updateUserProfileDto.LastName ?? data.LastName;
-
-                    data.FullName = $"{data.FistName} {data.LastName}";
-                }
-                if (userProfile.Users != null)
-                {
-                    userProfile.Users.Email = updateUserProfileDto.Email ?? userProfile.Users.Email;
-                }
+                
                 await _dBContext.SaveChangesAsync();
                 await transaction.CommitAsync();
             }

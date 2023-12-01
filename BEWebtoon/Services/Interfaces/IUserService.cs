@@ -10,6 +10,7 @@ namespace BEWebtoon.Services.Interfaces
         Task<UserDto> GetById(int id);
         Task CreateUser(CreateUserDto user);
         Task DeleteUser(int id);
+        Task UpdateUser(UpdateUserDto user);
         Task<PagedResult<UserDto>> GetUserPagination(SeacrhPagingRequest request);
         Task RegisterUser(RegisterUserDto userDto);
         Task LoginUser(LoginUserDto userDto);

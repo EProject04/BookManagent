@@ -28,7 +28,10 @@ namespace BEWebtoon.Services
         {
             await _userRepository.ForgotPassword(forgotPasswordDto);
         }
-
+        public async Task UpdateUser(UpdateUserDto user)
+        {
+            await _userRepository.UpdateUser(user);
+        }
         public async Task<List<UserDto>> GetAll()
         {
             return  await _userRepository.GetAll();
