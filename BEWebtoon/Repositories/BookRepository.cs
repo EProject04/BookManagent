@@ -209,7 +209,11 @@ namespace BEWebtoon.Repositories
                              .ToListAsync();
             if (!string.IsNullOrEmpty(request.keyword.TrimAndLower()))
                 query = query.Where(x => x.Title.ToLower().Contains(request.keyword.ToLower())
-                                        || SearchHelper.ConvertToUnSign(x.Title).ToLower().Contains(request.keyword.ToLower())).ToList();
+                                        || SearchHelper.ConvertToUnSign(x.Title).ToLower().Contains(request.keyword.ToLower())
+                                        || x.BookFollows.Any(bf => bf.Authors.AuthorName.TrimAndLower().Contains(request.keyword.TrimAndLower()))
+                                        || x.CategoryBooks.Any(bf => bf.Categories.CategoryName.TrimAndLower().Contains(request.keyword.TrimAndLower()))
+                                        || x.BookFollows.Any(bf => bf.Authors.Id.ToString().TrimAndLower().Contains(request.keyword.TrimAndLower()))
+                                        || x.CategoryBooks.Any(bf => bf.Categories.Id.ToString().TrimAndLower().Contains(request.keyword.TrimAndLower()))).ToList();
             if (!string.IsNullOrEmpty(request.AuthorID.ToString()))
             {
                 query = query.Where(b => b.BookFollows.Any(bf => bf.Authors.Id == request.AuthorID)).ToList();
