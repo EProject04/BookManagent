@@ -105,27 +105,32 @@ namespace BEWebtoon.Repositories
             {
                 var userId = _sessionManager.GetSessionValueInt("UserId");
                 var following = await _dBContext.Followings
-               .Include(x => x.Books)
-               .FirstOrDefaultAsync(b => b.UserId == userId && b.Id == updateFollowingDto.Id);
-
+                    .Include(x => x.Books)
+                    .FirstOrDefaultAsync(b => b.UserId == userId && b.Id == updateFollowingDto.Id);
 
                 if (following != null)
                 {
-                    var booksToFollow = await _dBContext.Books
-                        .Where(book => updateFollowingDto.BookIds.Contains(book.Id))
-                        .ToListAsync();
+                    var bookId = updateFollowingDto.BookId;
 
-                    var booksToRemove = following.Books.Except(booksToFollow).ToList();
-                    var booksToAdd = booksToFollow.Except(following.Books).ToList();
+                    var existingBook = following.Books.FirstOrDefault(b => b.Id == bookId);
 
-                    foreach (var book in booksToRemove)
+                    if (existingBook == null)
                     {
-                        following.Books.Remove(book);
+                        var bookToFollow = await _dBContext.Books
+                            .FirstOrDefaultAsync(book => book.Id == bookId);
+
+                        if (bookToFollow != null)
+                        {
+                            following.Books.Add(bookToFollow);
+                        }
+                        else
+                        {
+                            throw new InvalidOperationException("Cuốn sách không tồn tại.");
+                        }
                     }
-
-                    foreach (var book in booksToAdd)
+                    else
                     {
-                        following.Books.Add(book);
+                        following.Books.Remove(existingBook);
                     }
 
                     await _dBContext.SaveChangesAsync();
@@ -135,8 +140,8 @@ namespace BEWebtoon.Repositories
             {
                 throw new UnauthorizedAccessException("Người dùng chưa đăng nhập");
             }
-           
         }
+
 
 
     }

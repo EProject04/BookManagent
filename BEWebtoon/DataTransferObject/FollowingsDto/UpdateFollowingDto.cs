@@ -3,7 +3,7 @@
     public class UpdateFollowingDto 
     {
         public int Id { get; set; }
-        public List<int>? BookIds { get; set; }
+        public int? BookId { get; set; }
 
     }
 }
